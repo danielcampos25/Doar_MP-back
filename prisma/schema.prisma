@@ -31,4 +31,6 @@ model Doacao {
   produto       String
   quantidade    Int
   status        String
+  postadoEm     DateTime
+  recebidoEm    DateTime?
 }
