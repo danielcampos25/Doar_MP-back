@@ -8,27 +8,84 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Doador {
-  id               Int       @id @default(autoincrement())
-  email            String    @unique
-  name             String
-  doacoesEnviadas  Doacao[]  @relation("DoacoesEnviadas")
+model Usuario {
+  id         Int   @id @default(autoincrement())
+  nome       String
+  email      String   @unique
+  senha      String
+  fotoPerfil String?
+  endereco   Enderecos @relation(fields: [enderecoID], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  enderecoID Int
+  doacoes    Doacao[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
-model Instituicao {
-  id               Int       @id @default(autoincrement())
-  email            String    @unique
-  name             String
-  doacoesRecebidas Doacao[]  @relation("DoacoesRecebidas")
+model Enderecos {
+  id         Int    @id @default(autoincrement())
+  cep        Int
+  logradouro String
+  numero     Int?
+  bairro     String
+  cidade     String
+  estado     String
+  usuario    Usuario[]
+  destinatario Destinatario[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Destinatario {
+  id            Int    @id @default(autoincrement())
+  CPF_CNPJ      String?   @unique
+  nome_razaoSocial String
+  endereco      Enderecos @relation(fields: [enderecoID], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  enderecoID    Int
+  doacoes       Doacao[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model Doacao {
-  id            Int         @id @default(autoincrement())
-  doadorId      Int
-  instituicaoId Int
-  doador        Doador      @relation(fields: [doadorId], references: [id], name: "DoacoesEnviadas")
-  instituicao   Instituicao @relation(fields: [instituicaoId], references: [id], name: "DoacoesRecebidas")
-  produto       String
-  quantidade    Int
-  status        String
+  id              Int       @id @default(autoincrement())
+  usuario         Usuario      @relation(fields: [usuarioID], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  usuarioID       Int
+  destinatario    Destinatario @relation(fields: [destinatarioID], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  destinatarioID  Int
+  status          String
+  descricao       String
+  qtdItens        Int
+  QRCode          String
+  codigoRastreamento String
+  entregue        Boolean
+  rastreamento    Rastreamento[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+model Rastreamento {
+  id           Int      @id @default(autoincrement())
+  doacao       Doacao      @relation(fields: [doacaoID], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  doacaoID     Int
+  localizacao  String
+  descricao    String
+  midias       Midias[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Midias {
+  id            Int        @id @default(autoincrement())
+  rastreamento  Rastreamento  @relation(fields: [rastreamentoID], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  rastreamentoID Int
+  tipo          String
+  url           String
+  createdAt     DateTime      @default(now())
+}
+
+model Estatisticas {
+  id            Int    @id @default(autoincrement())
+  totalRealizada Int
+  totalEntregue  Int
+  totalItens     Int
 }
