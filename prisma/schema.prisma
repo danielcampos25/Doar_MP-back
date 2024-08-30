@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,29 +7,72 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Doador {
-  id               Int       @id @default(autoincrement())
-  email            String    @unique
-  name             String
-  doacoesEnviadas  Doacao[]  @relation("DoacoesEnviadas")
+model Usuario {
+  id         Int      @id @default(autoincrement())
+  nome       String
+  email      String   @unique
+  senha      String
+  fotoPerfil String?
+  endereco   String
+  doacoes    Doacao[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Instituicao {
-  id               Int       @id @default(autoincrement())
-  email            String    @unique
-  name             String
-  doacoesRecebidas Doacao[]  @relation("DoacoesRecebidas")
+  id          Int      @id @default(autoincrement())
+  razaoSocial String
+  email       String   @unique
+  senha       String
+  fotoPerfil  String?
+  endereco    String
+  doacoes     Doacao[] 
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Doacao {
-  id            Int         @id @default(autoincrement())
-  doadorId      Int
-  instituicaoId Int
-  doador        Doador      @relation(fields: [doadorId], references: [id], name: "DoacoesEnviadas")
-  instituicao   Instituicao @relation(fields: [instituicaoId], references: [id], name: "DoacoesRecebidas")
-  produto       String
-  quantidade    Int
-  status        String
-  postadoEm     DateTime
-  recebidoEm    DateTime?
+  id                 Int            @id @default(autoincrement())
+  usuarioID          Int
+  destinatarioID     Int
+  descricao          String
+  qtdItens           Int
+  QRCode             String
+  codigoRastreamento String
+  entregue           Boolean
+  rastreamento       Rastreamento[]
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  usuario      Usuario     @relation(fields: [usuarioID], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  destinatario Instituicao @relation(fields: [destinatarioID], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model Rastreamento {
+  id          Int      @id @default(autoincrement())
+  doacaoID    Int
+  localizacao String
+  status      String?
+  midias      Midias[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  doacao Doacao @relation(fields: [doacaoID], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model Midias {
+  id             Int      @id @default(autoincrement())
+  rastreamentoID Int
+  tipo           String
+  url            String
+  createdAt      DateTime @default(now())
+
+  rastreamento Rastreamento @relation(fields: [rastreamentoID], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model Estatisticas {
+  id               Int @id @default(autoincrement())
+  totalCadastradas Int
+  totalEntregue    Int
+  totalItens       Int
 }
