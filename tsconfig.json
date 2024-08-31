@@ -9,7 +9,7 @@
     "target": "ES2021",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./src", // Ajuste o baseUrl para apontar para a pasta 'src'
+    "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
@@ -18,10 +18,6 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "typeRoots": ["./node_modules/@types"],
-    "types": ["node", "jest"],
-    "paths": {
-      "*": ["*"],
-      "src/*": ["./*"]
-    }
+    "types": ["node", "jest"]
   }
 }
