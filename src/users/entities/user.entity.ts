@@ -17,6 +17,11 @@ export class UserEntity implements Usuario {
   @IsString({ message: 'O nome deve ser uma string.' })
   nome: string;
 
+  @IsNotEmpty({ message: 'O nome não pode estar vazio.' })
+  @IsString({ message: 'O nome deve ser uma string.' })
+  endereco: string;
+
+
   @IsNotEmpty({ message: 'O email não pode estar vazio.' })
   @IsEmail({}, { message: 'Deve ser um endereço de email válido.' })
   email: string;
