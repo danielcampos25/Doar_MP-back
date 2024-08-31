@@ -3,7 +3,9 @@ import { DonationsService } from './donations.service';
 import { DonationEntity } from './entities/donation.entity';
 import { NotFoundException } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
+
+
 describe('DonationsService', () => {
   let service: DonationsService;
 

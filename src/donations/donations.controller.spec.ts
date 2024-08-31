@@ -4,6 +4,7 @@ import { DonationsService } from './donations.service';
 import { DonationEntity } from './entities/donation.entity';
 import { CreateDonationDto } from './dto/create-donation.dto';
 import { UpdateDonationDto } from './dto/update-donation.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 describe('DonationsController', () => {
   let controller: DonationsController;
