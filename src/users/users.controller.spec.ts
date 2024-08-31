@@ -3,10 +3,11 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 
 describe('UsersController', () => {
-  let usersService: UsersService;
   let usersController: UsersController;
+  let usersService: UsersService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -39,7 +40,8 @@ describe('UsersController', () => {
         nome: 'Manu',
         email: 'manu@aluno.unb.br',
         senha: 'M4nu@UnB',
-        enderecoID: 1,
+        fotoPerfil: 'profile.jpg',
+        endereco: 'Rua A, 123',
       };
       const createdUser = { id: 1, ...createUserDto };
 
@@ -47,6 +49,27 @@ describe('UsersController', () => {
 
       const result = await usersController.create(createUserDto);
       expect(result).toEqual(createdUser);
+      expect(usersService.create).toHaveBeenCalledWith(createUserDto);
+    });
+
+    it('should throw a ConflictException if the email is already in use', async () => {
+      const createUserDto: CreateUserDto = {
+        nome: 'Manu',
+        email: 'manu@aluno.unb.br',
+        senha: 'M4nu@UnB',
+        fotoPerfil: 'profile.jpg',
+        endereco: 'Rua A, 123',
+      };
+
+      jest
+        .spyOn(usersService, 'create')
+        .mockRejectedValue(
+          new ConflictException('Este e-mail já está em uso.'),
+        );
+
+      await expect(usersController.create(createUserDto)).rejects.toThrow(
+        ConflictException,
+      );
       expect(usersService.create).toHaveBeenCalledWith(createUserDto);
     });
   });
@@ -58,8 +81,8 @@ describe('UsersController', () => {
           id: 1,
           nome: 'Manu',
           email: 'manu@aluno.unb.br',
-          senha: 'M4nu@UnB',
-          enderecoID: 1,
+          fotoPerfil: null,
+          endereco: 'Rua A, 123',
         },
       ];
 
@@ -77,14 +100,25 @@ describe('UsersController', () => {
         id: 1,
         nome: 'Manu',
         email: 'manu@aluno.unb.br',
-        senha: 'M4nu@UnB',
-        enderecoID: 1,
+        fotoPerfil: null,
+        endereco: 'Rua A, 123',
       };
 
       jest.spyOn(usersService, 'findOne').mockResolvedValue(user);
 
       const result = await usersController.findOne('1');
       expect(result).toEqual(user);
+      expect(usersService.findOne).toHaveBeenCalledWith(1);
+    });
+
+    it('should throw a NotFoundException if the user does not exist', async () => {
+      jest
+        .spyOn(usersService, 'findOne')
+        .mockRejectedValue(new NotFoundException('Usuário não encontrado.'));
+
+      await expect(usersController.findOne('1')).rejects.toThrow(
+        NotFoundException,
+      );
       expect(usersService.findOne).toHaveBeenCalledWith(1);
     });
   });
@@ -94,10 +128,10 @@ describe('UsersController', () => {
       const updateUserDto: UpdateUserDto = { nome: 'Emanuel' };
       const updatedUser = {
         id: 1,
-        ...updateUserDto,
-        email: 'manu@aluno.unb.br',
-        senha: 'M4nu@UnB',
-        enderecoID: 1,
+        nome: updateUserDto.nome,
+        email: 'emanuel@aluno.unb.br',
+        fotoPerfil: 'newProfile.jpg',
+        endereco: 'Rua B, 456',
       };
 
       jest.spyOn(usersService, 'update').mockResolvedValue(updatedUser);
@@ -106,21 +140,63 @@ describe('UsersController', () => {
       expect(result).toEqual(updatedUser);
       expect(usersService.update).toHaveBeenCalledWith(1, updateUserDto);
     });
+
+    it('should throw a NotFoundException if the user does not exist', async () => {
+      const updateUserDto: UpdateUserDto = { nome: 'Emanuel' };
+
+      jest
+        .spyOn(usersService, 'update')
+        .mockRejectedValue(new NotFoundException('Usuário não encontrado.'));
+
+      await expect(usersController.update('1', updateUserDto)).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(usersService.update).toHaveBeenCalledWith(1, updateUserDto);
+    });
+
+    it('should throw a ConflictException if the email is already in use by another user', async () => {
+      const updateUserDto: UpdateUserDto = { email: 'outrousuario@unb.br' };
+
+      jest
+        .spyOn(usersService, 'update')
+        .mockRejectedValue(
+          new ConflictException(
+            'Este e-mail já está em uso por outro usuário.',
+          ),
+        );
+
+      await expect(usersController.update('1', updateUserDto)).rejects.toThrow(
+        ConflictException,
+      );
+      expect(usersService.update).toHaveBeenCalledWith(1, updateUserDto);
+    });
   });
 
   describe('remove', () => {
     it('should remove a user', async () => {
-      const result = {
+      const user = {
         id: 1,
         nome: 'Manu',
         email: 'manu@aluno.unb.br',
-        senha: 'M4nu@UnB',
-        enderecoID: 1,
+        fotoPerfil: null,
+        endereco: 'Rua A, 123',
       };
 
-      jest.spyOn(usersService, 'remove').mockResolvedValue(result);
+      jest.spyOn(usersService, 'remove').mockResolvedValue(user);
 
-      await usersController.remove('1');
+      const result = await usersController.remove('1');
+      expect(result).toEqual(user);
+      expect(usersService.remove).toHaveBeenCalledWith(1);
+    });
+
+    it('should throw a NotFoundException if the user does not exist', async () => {
+      jest
+        .spyOn(usersService, 'remove')
+        .mockRejectedValue(new NotFoundException('Usuário não encontrado.'));
+
+      await expect(usersController.remove('1')).rejects.toThrow(
+        NotFoundException,
+      );
       expect(usersService.remove).toHaveBeenCalledWith(1);
     });
   });
