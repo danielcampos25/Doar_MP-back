@@ -33,8 +33,8 @@ export class UserEntity implements Usuario {
   fotoPerfil: string;
 
   @IsNotEmpty({ message: 'O ID do endereço não pode estar vazio.' })
-  @IsNumber({}, { message: 'O ID do endereço deve ser um número.' })
-  enderecoID: number;
+  @IsString({ message: 'O endereço deve ser uma string.' })
+  endereco: string;
 
   @IsDate()
   createdAt: Date;

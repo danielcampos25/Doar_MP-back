@@ -6,5 +6,5 @@ export class CreateUserDto extends PickType(UserEntity, [
   'email',
   'senha',
   'fotoPerfil',
-  'enderecoID',
+  'endereco',
 ]) {}
