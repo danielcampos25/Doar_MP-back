@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -22,7 +23,6 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
-
     const existingUser = await this.prisma.usuario.findUnique({
       where: { email: createUserDto.email },
     });
@@ -46,7 +46,9 @@ export class UsersService {
 
   private async findUser(criterio: Prisma.UsuarioWhereUniqueInput) {
     if (!criterio.id && !criterio.email) {
-      throw new Error('É necessário informar o id ou o email do usuário.');
+      throw new BadRequestException(
+        'É necessário informar o id ou o email do usuário.',
+      );
     }
     const user = await this.prisma.usuario.findUnique({
       where: criterio,
