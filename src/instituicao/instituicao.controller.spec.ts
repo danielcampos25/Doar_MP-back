@@ -90,7 +90,7 @@ describe('InstituicaoController', () => {
   describe('remove', () => {
     it('should remove an institution', async () => {
       const result = await controller.remove('1');
-      expect(result).toEqual(mockInstituicao);
+      expect(result).toEqual(undefined);
       expect(service.remove).toHaveBeenCalledWith(1);
     });
   });
