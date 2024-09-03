@@ -52,16 +52,12 @@ export class TrackingService {
       where: { id },
     });
   }
-
   async findByDonationId(doacaoID: number) {
     const trackings = await this.prisma.rastreamento.findMany({
-      where: { doacaoID },
+      where: {
+        doacaoID: doacaoID, // Certifique-se de que doacaoID é um número
+      },
     });
-
-    if (!trackings.length) {
-      throw new NotFoundException(`No tracking found for donation ID ${doacaoID}`);
-    }
-
     return trackings;
   }
 }

@@ -38,6 +38,6 @@ export class TrackingController {
 
   @Get('donation/:doacaoID')
   async findByDonationId(@Param('doacaoID') doacaoID: number) {
-    return this.trackingService.findByDonationId(doacaoID);
+    return this.trackingService.findByDonationId(Number(doacaoID));
   }
 }
