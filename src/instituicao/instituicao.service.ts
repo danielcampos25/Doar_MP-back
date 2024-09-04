@@ -9,6 +9,9 @@ import { UpdateInstituicaoDto } from './dto/update-instituicao.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
+import * as multer from 'multer';
+import * as path from 'path';
+import * as fs from 'fs';
 
 const InstituicaoSelection = {
   id: true,
@@ -133,4 +136,36 @@ export class InstituicaoService {
       select: InstituicaoSelection,
     });
   }
+
+  async uploadInstitutionPic(file: Express.Multer.File, id: number): Promise<string> {
+    if (!file) {
+      throw new BadRequestException('Arquivo não fornecido');
+    }
+
+    const instituicao = await this.prisma.instituicao.findUnique({
+      where: { id },
+    });
+
+    if (!instituicao) {
+      throw new NotFoundException('Instituição não encontrada.');
+    }
+
+    const uploadPath = path.join(__dirname, '..', '..','uploads', 'upload-institution-photo');
+    const filePath = path.join(uploadPath, file.originalname);
+
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+
+    fs.writeFileSync(filePath, file.buffer);
+
+    await this.prisma.instituicao.update({
+      where: { id },
+      data: { fotoPerfil: filePath },
+    });
+
+    return filePath; 
+  }
+
+ 
 }
