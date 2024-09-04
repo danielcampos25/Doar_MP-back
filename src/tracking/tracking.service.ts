@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTrackingDto } from './dto/create-tracking.dto';
 import { UpdateTrackingDto } from './dto/update-tracking.dto';
-
+import transporter from 'src/nodemailer';
 @Injectable()
 export class TrackingService {
   constructor(private readonly prisma: PrismaService) {}
@@ -11,6 +11,31 @@ export class TrackingService {
     const tracking = await this.prisma.rastreamento.create({
       data: createTrackingDto,
     });
+
+    // Obter a doação associada ao rastreamento
+    const donation = await this.prisma.doacao.findUnique({
+      where: { id: tracking.doacaoID },
+      include: {
+        usuario: true, // Inclui o usuário associado
+      },
+    });
+
+    if (!donation) {
+      throw new NotFoundException(`Doação com ID ${tracking.doacaoID} não encontrada.`);
+    }
+
+    // Verifica se o usuário existe e tem um e-mail válido
+    if (donation.usuario && donation.usuario.email) {
+      await transporter.sendMail({
+        from: 'doarpontocom@gmail.com',
+        to: donation.usuario.email, 
+        subject: 'Novo Rastreamento Criado',
+        text: `O objeto doado de id ${tracking.doacaoID} esta em 
+        localização: "${tracking.localizacao}".`,
+      });
+    } else {
+      throw new NotFoundException(`Email do usuário com ID ${donation.usuarioID} não encontrado.`);
+    }
 
     return {
       id: tracking.id,
