@@ -100,8 +100,11 @@ describe('UsersController', () => {
         id: 1,
         nome: 'Manu',
         email: 'manu@aluno.unb.br',
+        senha: 'M4nu@UnB',
         fotoPerfil: null,
         endereco: 'Rua A, 123',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       jest.spyOn(usersService, 'findOne').mockResolvedValue(user);

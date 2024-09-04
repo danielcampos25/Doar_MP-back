@@ -12,7 +12,7 @@ import {
 import { InstituicaoService } from './instituicao.service';
 import { CreateInstituicaoDto } from './dto/create-instituicao.dto';
 import { UpdateInstituicaoDto } from './dto/update-instituicao.dto';
-import { Public } from 'src/auth/decorators/isPublic.decorator';
+import { Public } from '../auth/decorators/isPublic.decorator';
 
 @Controller('instituicoes')
 export class InstituicaoController {

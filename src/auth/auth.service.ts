@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
-import { InstituicaoService } from 'src/instituicao/instituicao.service';
+import { UsersService } from '../users/users.service';
+import { InstituicaoService } from '../instituicao/instituicao.service';
 import * as bcrypt from 'bcrypt';
 import { UserPayload } from './types/UserPayload';
 import { JwtService } from '@nestjs/jwt';
@@ -46,7 +46,7 @@ export class AuthService {
     };
   }
 
-  private async validateUser(email: string, senha: string, userType: string) {
+  async validateUser(email: string, senha: string, userType: string) {
     if (userType !== 'user' && userType !== 'instituicao') {
       throw new UnauthorizedException('Tipo de usuário inválido.');
     }

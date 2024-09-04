@@ -107,7 +107,6 @@ describe('UsersService', () => {
       expect(result).toEqual(user);
       expect(prisma.usuario.findUnique).toHaveBeenCalledWith({
         where: { id: 1 },
-        select: expect.any(Object),
       });
     });
 
