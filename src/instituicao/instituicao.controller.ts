@@ -12,11 +12,13 @@ import {
 import { InstituicaoService } from './instituicao.service';
 import { CreateInstituicaoDto } from './dto/create-instituicao.dto';
 import { UpdateInstituicaoDto } from './dto/update-instituicao.dto';
+import { Public } from 'src/auth/decorators/isPublic.decorator';
 
 @Controller('instituicoes')
 export class InstituicaoController {
   constructor(private readonly instituicaoService: InstituicaoService) {}
 
+  @Public()
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createInstituicaoDto: CreateInstituicaoDto) {

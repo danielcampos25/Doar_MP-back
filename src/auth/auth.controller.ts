@@ -1,55 +1,30 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AuthController } from './auth.controller';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  Request,
+  Get,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginRequestBody } from './dto/loginRequestBody.dto';
+import { UserToken } from './types/UserToken';
+import { Public } from './decorators/isPublic.decorator';
 
-describe('AuthController', () => {
-  let controller: AuthController;
-  let authService: AuthService;
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [AuthController],
-      providers: [
-        {
-          provide: AuthService,
-          useValue: {
-            login: jest.fn(),
-          },
-        },
-      ],
-    }).compile();
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @Post('login')
+  async login(@Body() loginRequestBody: LoginRequestBody): Promise<UserToken> {
+    return this.authService.login(loginRequestBody);
+  }
 
-    controller = module.get<AuthController>(AuthController);
-    authService = module.get<AuthService>(AuthService);
-  });
-
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
-
-  describe('login', () => {
-    it('should return a JWT token', async () => {
-      const loginRequestBody: LoginRequestBody = {
-        email: 'user@example.com',
-        senha: 'password123',
-      };
-      const token = { access_token: 'jwt_token' };
-
-      jest.spyOn(authService, 'login').mockResolvedValueOnce(token);
-
-      const result = await controller.login(loginRequestBody);
-      expect(result).toEqual(token);
-      expect(authService.login).toHaveBeenCalledWith(loginRequestBody);
-    });
-  });
-
-  describe('getProfile', () => {
-    it('should return the user profile', () => {
-      const req = { user: { id: 1, email: 'user@example.com' } };
-
-      const result = controller.getProfile(req);
-      expect(result).toEqual(req.user);
-    });
-  });
-});
+  @Get('me')
+  getProfile(@Request() req) {
+    return req.user;
+  }
+}
