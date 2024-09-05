@@ -9,5 +9,6 @@ import { InstituicaoModule } from 'src/instituicao/instituicao.module';
   imports: [UsersModule, InstituicaoModule, JwtModule],
   controllers: [AuthController],
   providers: [AuthService],
+  exports: [AuthService],
 })
 export class AuthModule {}

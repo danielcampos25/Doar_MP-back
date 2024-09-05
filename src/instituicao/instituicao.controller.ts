@@ -8,11 +8,13 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { InstituicaoService } from './instituicao.service';
 import { CreateInstituicaoDto } from './dto/create-instituicao.dto';
 import { UpdateInstituicaoDto } from './dto/update-instituicao.dto';
 import { Public } from '../auth/decorators/isPublic.decorator';
+import { OwnershipGuard } from 'src/auth/guards/ownershipGuard.guard';
 
 @Controller('instituicoes')
 export class InstituicaoController {
@@ -35,6 +37,7 @@ export class InstituicaoController {
     return await this.instituicaoService.findOne(+id);
   }
 
+  @UseGuards(OwnershipGuard)
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -43,6 +46,7 @@ export class InstituicaoController {
     return await this.instituicaoService.update(+id, updateInstituicaoDto);
   }
 
+  @UseGuards(OwnershipGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string) {

@@ -141,7 +141,7 @@ describe('DonationsController', () => {
 
   describe('remove', () => {
     it('should remove a donation', async () => {
-      const result = { deleted: true };
+      // const result = { deleted: true };
 
       jest.spyOn(service, 'remove').mockResolvedValue(null);
 
