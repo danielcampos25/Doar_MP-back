@@ -4,6 +4,9 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ConflictException, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { OwnershipGuard } from '../auth/guards/ownershipGuard.guard';
+import { InstituicaoService } from '../instituicao/instituicao.service';
 
 describe('UsersController', () => {
   let usersController: UsersController;
@@ -13,6 +16,9 @@ describe('UsersController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       providers: [
+        PrismaService,
+        OwnershipGuard,
+        InstituicaoService,
         {
           provide: UsersService,
           useValue: {
@@ -100,8 +106,11 @@ describe('UsersController', () => {
         id: 1,
         nome: 'Manu',
         email: 'manu@aluno.unb.br',
+        senha: 'M4nu@UnB',
         fotoPerfil: null,
         endereco: 'Rua A, 123',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       jest.spyOn(usersService, 'findOne').mockResolvedValue(user);

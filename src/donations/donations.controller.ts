@@ -1,9 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { DonationsService } from './donations.service';
 import { CreateDonationDto } from './dto/create-donation.dto';
 import { UpdateDonationDto } from './dto/update-donation.dto';
 import { DonationEntity } from './entities/donation.entity';
-
+import { DonationOwnershipGuard } from '../auth/guards/donationOwnershipGuard.guard';
 
 @Controller('donations')
 export class DonationsController {
@@ -20,12 +29,16 @@ export class DonationsController {
   }
 
   @Get(':id')
-findOne(@Param('id') id: string): Promise<DonationEntity> {
-  return this.donationsService.findOne(Number(id)); 
-}
+  findOne(@Param('id') id: string): Promise<DonationEntity> {
+    return this.donationsService.findOne(Number(id));
+  }
 
+  @UseGuards(DonationOwnershipGuard)
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updateDonationDto: UpdateDonationDto): Promise<DonationEntity> {
+  update(
+    @Param('id') id: number,
+    @Body() updateDonationDto: UpdateDonationDto,
+  ): Promise<DonationEntity> {
     return this.donationsService.update(Number(id), updateDonationDto);
   }
 
@@ -34,6 +47,7 @@ findOne(@Param('id') id: string): Promise<DonationEntity> {
     return this.donationsService.entregaConcluida(Number(id));
   }
 
+  @UseGuards(DonationOwnershipGuard)
   @Delete(':id')
   remove(@Param('id') id: number): Promise<void> {
     return this.donationsService.remove(Number(id));

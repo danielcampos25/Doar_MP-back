@@ -4,7 +4,7 @@ import { DonationsService } from './donations.service';
 import { DonationEntity } from './entities/donation.entity';
 import { CreateDonationDto } from './dto/create-donation.dto';
 import { UpdateDonationDto } from './dto/update-donation.dto';
-import { PrismaService } from '../prisma/prisma.service';
+// import { PrismaService } from '../prisma/prisma.service';
 
 describe('DonationsController', () => {
   let controller: DonationsController;
@@ -111,7 +111,7 @@ describe('DonationsController', () => {
         codigoRastreamento: 'tracking456',
         entregue: true,
       };
-  
+
       const existingDonation: DonationEntity = {
         id: 1,
         usuarioID: 1,
@@ -124,27 +124,28 @@ describe('DonationsController', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-  
+
       const updatedDonation: DonationEntity = {
         ...existingDonation,
         ...updateDonationDto,
         updatedAt: new Date(), // Atualiza apenas as propriedades alteradas
       };
-  
+
       jest.spyOn(service, 'update').mockResolvedValue(updatedDonation);
-  
-      expect(await controller.update(1, updateDonationDto)).toBe(updatedDonation);
+
+      expect(await controller.update(1, updateDonationDto)).toBe(
+        updatedDonation,
+      );
     });
   });
 
-      
   describe('remove', () => {
     it('should remove a donation', async () => {
-      const result = { deleted: true };
+      // const result = { deleted: true };
 
       jest.spyOn(service, 'remove').mockResolvedValue(null);
 
-      expect(await controller.remove(1)).toBe(result);
+      expect(await controller.remove(1)).toBe(null);
     });
   });
 });

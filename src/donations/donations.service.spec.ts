@@ -106,7 +106,7 @@ describe('DonationsService', () => {
   describe('remove', () => {
     it('should remove a donation', async () => {
       const result = await service.remove(1);
-      expect(result).toEqual(mockDonation);
+      expect(result).toEqual(undefined);
       expect(mockPrismaService.doacao.delete).toHaveBeenCalledWith({
         where: { id: 1 },
       });

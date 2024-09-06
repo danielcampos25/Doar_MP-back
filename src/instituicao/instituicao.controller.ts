@@ -8,6 +8,7 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  UseGuards,
   UseInterceptors,
   UploadedFile,
   Res,
@@ -15,6 +16,8 @@ import {
 import { InstituicaoService } from './instituicao.service';
 import { CreateInstituicaoDto } from './dto/create-instituicao.dto';
 import { UpdateInstituicaoDto } from './dto/update-instituicao.dto';
+import { Public } from '../auth/decorators/isPublic.decorator';
+import { OwnershipGuard } from '../auth/guards/ownershipGuard.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { Response } from 'express';
@@ -23,6 +26,7 @@ import { Response } from 'express';
 export class InstituicaoController {
   constructor(private readonly instituicaoService: InstituicaoService) {}
 
+  @Public()
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createInstituicaoDto: CreateInstituicaoDto) {
@@ -39,6 +43,7 @@ export class InstituicaoController {
     return await this.instituicaoService.findOne(+id); // Converte para número
   }
 
+  @UseGuards(OwnershipGuard)
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -47,6 +52,7 @@ export class InstituicaoController {
     return await this.instituicaoService.update(+id, updateInstituicaoDto); // Converte para número
   }
 
+  @UseGuards(OwnershipGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string) {

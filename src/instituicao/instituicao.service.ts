@@ -39,10 +39,7 @@ export class InstituicaoService {
       throw new ConflictException('Este e-mail já está em uso.');
     }
 
-    const hashedPassword = await bcrypt.hashSync(
-      createInstituicaoDto.senha,
-      10,
-    );
+    const hashedPassword = await bcrypt.hash(createInstituicaoDto.senha, 10);
 
     return await this.prisma.instituicao.create({
       data: { ...createInstituicaoDto, senha: hashedPassword },
@@ -56,9 +53,7 @@ export class InstituicaoService {
     });
   }
 
-  private async findInstituicao(
-    criterio: Prisma.InstituicaoWhereUniqueInput,
-  ): Promise<InstituicaoType> {
+  private async findInstituicao(criterio: Prisma.InstituicaoWhereUniqueInput) {
     if (!criterio.id && !criterio.email) {
       throw new BadRequestException(
         'É necessário informar o id ou o email da Instituição.',
@@ -66,7 +61,6 @@ export class InstituicaoService {
     }
     const instituicao = await this.prisma.instituicao.findUnique({
       where: criterio,
-      select: InstituicaoSelection,
     });
 
     if (!instituicao) {
@@ -97,7 +91,7 @@ export class InstituicaoService {
     }
 
     if (updateInstituicaoDto.senha) {
-      updateInstituicaoDto.senha = await bcrypt.hashSync(
+      updateInstituicaoDto.senha = await bcrypt.hash(
         updateInstituicaoDto.senha,
         10,
       );

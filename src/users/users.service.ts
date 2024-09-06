@@ -34,7 +34,7 @@ export class UsersService {
       throw new ConflictException('Este e-mail já está em uso.');
     }
 
-    const hashedPassword = await bcrypt.hashSync(createUserDto.senha, 10);
+    const hashedPassword = await bcrypt.hash(createUserDto.senha, 10);
 
     return await this.prisma.usuario.create({
       data: { ...createUserDto, senha: hashedPassword },
@@ -56,7 +56,6 @@ export class UsersService {
     }
     const user = await this.prisma.usuario.findUnique({
       where: criterio,
-      select: UserSelection,
     });
 
     if (!user) {
@@ -82,7 +81,7 @@ export class UsersService {
     }
 
     if (updateUserDto.senha) {
-      updateUserDto.senha = await bcrypt.hashSync(updateUserDto.senha, 10);
+      updateUserDto.senha = await bcrypt.hash(updateUserDto.senha, 10);
     }
 
     if (updateUserDto.email) {

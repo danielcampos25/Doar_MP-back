@@ -14,7 +14,7 @@ export class InstituicaoEntity implements Instituicao {
   id: number;
 
   @IsNotEmpty({ message: 'A razão social não pode estar vazio.' })
-  @IsString({ message: 'A razão social ser uma string.' })
+  @IsString({ message: 'A razão social deve ser uma string.' })
   razaoSocial: string;
 
   @IsNotEmpty({ message: 'O email não pode estar vazio.' })
