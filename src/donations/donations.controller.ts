@@ -44,7 +44,7 @@ export class DonationsController {
 
   @Patch(':id/entrega-concluida')
   entregaConcluida(@Param('id') id: number): Promise<DonationEntity> {
-    return this.donationsService.entregaConcluida(id);
+    return this.donationsService.entregaConcluida(Number(id));
   }
 
   @UseGuards(DonationOwnershipGuard)

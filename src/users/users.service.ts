@@ -9,6 +9,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
+import { Express } from 'express';
+import * as fs from 'fs';
+import * as path from 'path';
+
 
 const UserSelection = {
   id: true,
@@ -110,5 +114,29 @@ export class UsersService {
       where: { id },
       select: UserSelection,
     });
+  }
+
+  async uploadUserPic(file: Express.Multer.File, userId: number): Promise<string> {
+    if (!file) {
+      throw new BadRequestException('Arquivo não fornecido');
+    }
+
+    const uploadDir = path.join(__dirname, '..', '..', 'uploads', 'upload-user-photo');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const filePath = path.join(uploadDir, `${userId}-${file.originalname}`);
+    
+    // Salvar o arquivo
+    fs.writeFileSync(filePath, file.buffer);
+
+    // Atualizar a foto do perfil no banco de dados
+    await this.prisma.usuario.update({
+      where: { id: userId },
+      data: { fotoPerfil: filePath }, // Atualize com o caminho desejado
+    });
+
+    return filePath; // Retorne o caminho do arquivo salvo
   }
 }
