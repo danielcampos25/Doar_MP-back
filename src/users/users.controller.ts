@@ -12,7 +12,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Public } from '../auth/decorators/isPublic.decorator';
-import { OwnershipGuard } from 'src/auth/guards/ownershipGuard.guard';
+import { OwnershipGuard } from '../auth/guards/ownershipGuard.guard';
 
 @Controller('users')
 export class UsersController {

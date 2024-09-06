@@ -14,7 +14,7 @@ import { InstituicaoService } from './instituicao.service';
 import { CreateInstituicaoDto } from './dto/create-instituicao.dto';
 import { UpdateInstituicaoDto } from './dto/update-instituicao.dto';
 import { Public } from '../auth/decorators/isPublic.decorator';
-import { OwnershipGuard } from 'src/auth/guards/ownershipGuard.guard';
+import { OwnershipGuard } from '../auth/guards/ownershipGuard.guard';
 
 @Controller('instituicoes')
 export class InstituicaoController {

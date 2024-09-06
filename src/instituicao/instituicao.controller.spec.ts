@@ -4,6 +4,9 @@ import { InstituicaoService } from './instituicao.service';
 import { CreateInstituicaoDto } from './dto/create-instituicao.dto';
 import { UpdateInstituicaoDto } from './dto/update-instituicao.dto';
 import { Instituicao } from '@prisma/client';
+import { OwnershipGuard } from '../auth/guards/ownershipGuard.guard';
+import { UsersService } from '../users/users.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 describe('InstituicaoController', () => {
   let controller: InstituicaoController;
@@ -25,6 +28,9 @@ describe('InstituicaoController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [InstituicaoController],
       providers: [
+        PrismaService,
+        OwnershipGuard,
+        UsersService,
         {
           provide: InstituicaoService,
           useValue: {
