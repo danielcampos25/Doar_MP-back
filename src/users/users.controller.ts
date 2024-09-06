@@ -6,10 +6,17 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  UploadedFile,
+  Res,
+  HttpStatus
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import * as multer from 'multer';
+import { Response } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -38,5 +45,20 @@ export class UsersController {
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
+  }
+
+  @Post(':id/upload-photo')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadUserPic(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Res() res: Response
+  ) {
+    try {
+      const filePath = await this.usersService.uploadUserPic(file, Number(id));
+      return res.json({ message: 'Foto de perfil carregada com sucesso', filePath });
+    } catch (error) {
+      return res.status(error.status || HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
+    }
   }
 }
