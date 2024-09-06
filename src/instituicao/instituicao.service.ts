@@ -161,5 +161,26 @@ export class InstituicaoService {
     return filePath; 
   }
 
+
+  async getInstitutionPic(id: number, res): Promise<void> {
+    const instituicao = await this.prisma.instituicao.findUnique({
+      where: { id },
+      select: { fotoPerfil: true }, 
+    });
+  
+    if (!instituicao || !instituicao.fotoPerfil) {
+      throw new NotFoundException('Foto não encontrada.');
+    }
+  
+    const filePath = instituicao.fotoPerfil;
+  
+    if (!fs.existsSync(filePath)) {
+      throw new NotFoundException('Arquivo de imagem não encontrado.');
+    }
+  
+    
+    res.setHeader('Content-Type', 'image/jpeg'); 
+    fs.createReadStream(filePath).pipe(res); 
+  }
  
 }

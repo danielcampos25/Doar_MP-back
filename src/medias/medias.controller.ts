@@ -1,16 +1,27 @@
-import { Controller, Post, Get, UploadedFile, UseInterceptors, Body, Param, Res } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  UploadedFile,
+  UseInterceptors,
+  Body,
+  Param,
+  Res,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MediasService } from './medias.service';
 import { CreateMediaDto } from './dto/create-media.dto';
-import * as multer from  'multer'
+import * as multer from 'multer';
 @Controller('medias')
 export class MediasController {
   constructor(private readonly mediasService: MediasService) {}
 
-  @Post('upload-photo')
-  @UseInterceptors(FileInterceptor('file', {
-    storage: multer.memoryStorage(), // Configurando para armazenar em memória
-  }))
+  @Post()
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: multer.memoryStorage(), // Configurando para armazenar em memória
+    }),
+  )
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @Body() createMediaDto: CreateMediaDto,
@@ -22,6 +33,8 @@ export class MediasController {
 
     return this.mediasService.uploadFile(file, createMediaDto);
   }
-
-  
+  @Get(':id')
+  async getMedia(@Param('id') mediaId: number, @Res() res: Response) {
+    return this.mediasService.getMedia(+mediaId, res);
+  }
 }

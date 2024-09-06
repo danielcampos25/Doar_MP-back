@@ -12,6 +12,8 @@ import { Prisma } from '@prisma/client';
 import { Express } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as mime from 'mime-types';
+
 
 
 const UserSelection = {
@@ -138,5 +140,29 @@ export class UsersService {
     });
 
     return filePath; // Retorne o caminho do arquivo salvo
+  }
+
+  async getUserPic(userId: number, res): Promise<void> {
+    const user = await this.prisma.usuario.findUnique({
+      where: { id: userId },
+      select: { fotoPerfil: true }, // Pegando apenas a foto de perfil
+    });
+  
+    if (!user || !user.fotoPerfil) {
+      throw new NotFoundException('Foto de perfil não encontrada.');
+    }
+  
+    const filePath = user.fotoPerfil;
+  
+    if (!fs.existsSync(filePath)) {
+      throw new NotFoundException('Arquivo de imagem não encontrado.');
+    }
+  
+    // Detecta o tipo MIME da imagem
+    const mimeType = mime.lookup(filePath) || 'application/octet-stream';
+    res.setHeader('Content-Type', mimeType);
+  
+    // Faz o streaming do arquivo de imagem
+    fs.createReadStream(filePath).pipe(res);
   }
 }

@@ -41,6 +41,11 @@ export class UsersController {
     return this.usersService.findOne(+id);
   }
 
+  @Get('foto/:id')
+  async getUserPic(@Param('id') userId: number, @Res() res: Response) {
+    return this.usersService.getUserPic(+userId, res);
+  }
+
   @UseGuards(OwnershipGuard)
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {

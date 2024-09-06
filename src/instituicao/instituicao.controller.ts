@@ -43,6 +43,11 @@ export class InstituicaoController {
     return await this.instituicaoService.findOne(+id); // Converte para número
   }
 
+  @Get('foto/:id')
+  async getInstitutionPic(@Param('id') id: number, @Res() res: Response) {
+    return this.instituicaoService.getInstitutionPic(+id, res);
+  }
+
   @UseGuards(OwnershipGuard)
   @Patch(':id')
   async update(
@@ -60,19 +65,29 @@ export class InstituicaoController {
   }
 
   @Post(':id/upload-photo')
-  @UseInterceptors(FileInterceptor('file', {
-    storage: multer.memoryStorage(), // Armazenar o arquivo na memória antes de salvá-lo no disco
-  }))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: multer.memoryStorage(), // Armazenar o arquivo na memória antes de salvá-lo no disco
+    }),
+  )
   async uploadInstitutionPic(
     @Param('id') id: string, // ID ainda como string
     @UploadedFile() file: Express.Multer.File,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     try {
-      const filePath = await this.instituicaoService.uploadInstitutionPic(file, +id); // Converte para número
-      return res.json({ message: 'Foto institucional carregada com sucesso', filePath });
+      const filePath = await this.instituicaoService.uploadInstitutionPic(
+        file,
+        +id,
+      ); // Converte para número
+      return res.json({
+        message: 'Foto institucional carregada com sucesso',
+        filePath,
+      });
     } catch (error) {
-      return res.status(error.status || HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
+      return res
+        .status(error.status || HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: error.message });
     }
   }
 }
