@@ -18,7 +18,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Public } from '../auth/decorators/isPublic.decorator';
 import { OwnershipGuard } from '../auth/guards/ownershipGuard.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as multer from 'multer';
 import { Response } from 'express';
 
 @Controller('users')
@@ -71,5 +70,11 @@ export class UsersController {
     } catch (error) {
       return res.status(error.status || HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
+  }
+
+  // Nova rota para retornar as contagens das tabelas
+  @Get('contagens')
+  async obterContagens() {
+    return this.usersService.contarLinhasTabelas();
   }
 }

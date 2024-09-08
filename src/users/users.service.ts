@@ -14,8 +14,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as mime from 'mime-types';
 
-
-
 const UserSelection = {
   id: true,
   nome: true,
@@ -27,6 +25,27 @@ const UserSelection = {
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
+
+  // Função que retorna a contagem de linhas nas tabelas
+  async contarLinhasTabelas() {
+    const totalUsuarios = await this.prisma.usuario.count();
+    const totalInstituicoes = await this.prisma.instituicao.count();
+    const totalDoacoes = await this.prisma.doacao.count();
+
+    // Supondo que a tabela doacao tem uma coluna "quantidadeItens"
+    const totalItensDoacao = await this.prisma.doacao.aggregate({
+      _sum: {
+        quantidadeItens: true,
+      },
+    });
+
+    return {
+      totalUsuarios,
+      totalInstituicoes,
+      totalDoacoes,
+      totalItensDoacao: totalItensDoacao._sum.quantidadeItens || 0, // Retorna 0 se não houver itens
+    };
+  }
 
   async create(createUserDto: CreateUserDto) {
     const existingUser = await this.prisma.usuario.findUnique({
