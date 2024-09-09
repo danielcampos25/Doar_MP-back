@@ -28,9 +28,12 @@ export class InstituicaoController {
 
   @Public()
   @Post()
-  @HttpCode(HttpStatus.CREATED)
-  async create(@Body() createInstituicaoDto: CreateInstituicaoDto) {
-    return await this.instituicaoService.create(createInstituicaoDto);
+  @UseInterceptors(FileInterceptor('fotoPerfil'))
+  async create(
+    @Body() createInstituicaoDto: CreateInstituicaoDto,
+    @UploadedFile() fotoPerfil: Express.Multer.File,
+  ) {
+    return this.instituicaoService.create(createInstituicaoDto, fotoPerfil);
   }
 
   @Get()

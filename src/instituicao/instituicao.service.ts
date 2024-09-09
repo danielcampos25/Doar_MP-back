@@ -31,6 +31,7 @@ export class InstituicaoService {
 
   async create(
     createInstituicaoDto: CreateInstituicaoDto,
+    fotoPerfil?: Express.Multer.File, // Adiciona o arquivo da foto de perfil
   ): Promise<InstituicaoType> {
     const existingInstituicao = await this.prisma.instituicao.findUnique({
       where: { email: createInstituicaoDto.email },
@@ -41,10 +42,16 @@ export class InstituicaoService {
 
     const hashedPassword = await bcrypt.hash(createInstituicaoDto.senha, 10);
 
-    return await this.prisma.instituicao.create({
+    const createdInstituicao = await this.prisma.instituicao.create({
       data: { ...createInstituicaoDto, senha: hashedPassword },
       select: InstituicaoSelection,
     });
+
+    if (fotoPerfil) {
+      await this.uploadInstitutionPic(fotoPerfil, createdInstituicao.id);
+    }
+
+    return createdInstituicao;
   }
 
   async findAll(): Promise<InstituicaoType[]> {
@@ -131,7 +138,10 @@ export class InstituicaoService {
     });
   }
 
-  async uploadInstitutionPic(file: Express.Multer.File, id: number): Promise<string> {
+  async uploadInstitutionPic(
+    file: Express.Multer.File,
+    id: number,
+  ): Promise<string> {
     if (!file) {
       throw new BadRequestException('Arquivo não fornecido');
     }
@@ -144,7 +154,13 @@ export class InstituicaoService {
       throw new NotFoundException('Instituição não encontrada.');
     }
 
-    const uploadPath = path.join(__dirname, '..', '..','uploads', 'upload-institution-photo');
+    const uploadPath = path.join(
+      __dirname,
+      '..',
+      '..',
+      'uploads',
+      'upload-institution-photo',
+    );
     const filePath = path.join(uploadPath, file.originalname);
 
     if (!fs.existsSync(uploadPath)) {
@@ -158,29 +174,26 @@ export class InstituicaoService {
       data: { fotoPerfil: filePath },
     });
 
-    return filePath; 
+    return filePath;
   }
-
 
   async getInstitutionPic(id: number, res): Promise<void> {
     const instituicao = await this.prisma.instituicao.findUnique({
       where: { id },
-      select: { fotoPerfil: true }, 
+      select: { fotoPerfil: true },
     });
-  
+
     if (!instituicao || !instituicao.fotoPerfil) {
       throw new NotFoundException('Foto não encontrada.');
     }
-  
+
     const filePath = instituicao.fotoPerfil;
-  
+
     if (!fs.existsSync(filePath)) {
       throw new NotFoundException('Arquivo de imagem não encontrado.');
     }
-  
-    
-    res.setHeader('Content-Type', 'image/jpeg'); 
-    fs.createReadStream(filePath).pipe(res); 
+
+    res.setHeader('Content-Type', 'image/jpeg');
+    fs.createReadStream(filePath).pipe(res);
   }
- 
 }

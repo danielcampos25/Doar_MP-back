@@ -28,20 +28,31 @@ const UserSelection = {
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto, fotoPerfil?: Express.Multer.File) {
     const existingUser = await this.prisma.usuario.findUnique({
       where: { email: createUserDto.email },
     });
+  
     if (existingUser) {
       throw new ConflictException('Este e-mail já está em uso.');
     }
-
+  
     const hashedPassword = await bcrypt.hash(createUserDto.senha, 10);
-
-    return await this.prisma.usuario.create({
-      data: { ...createUserDto, senha: hashedPassword },
+  
+    const createdUser = await this.prisma.usuario.create({
+      data: {
+        ...createUserDto,
+        senha: hashedPassword,
+      },
       select: UserSelection,
     });
+  
+    // Se houver foto de perfil, faça o upload após a criação do usuário
+    if (fotoPerfil) {
+      await this.uploadUserPic(fotoPerfil, createdUser.id);
+    }
+  
+    return createdUser;
   }
 
   async findAll() {
