@@ -105,8 +105,14 @@ describe('AuthService', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       };
+
       jest.spyOn(usersService, 'findByEmail').mockResolvedValue(user);
-      jest.spyOn(bcrypt, 'compare').mockResolvedValue(true);
+
+      jest
+        .spyOn(bcrypt, 'compare')
+        .mockImplementation(async (password: string): Promise<boolean> => {
+          return password === 'password';
+        });
 
       const result = await authService.validateUser(
         'test@example.com',
@@ -128,8 +134,14 @@ describe('AuthService', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       };
+
       jest.spyOn(usersService, 'findByEmail').mockResolvedValue(user);
-      jest.spyOn(bcrypt, 'compare').mockResolvedValue(false);
+
+      jest
+        .spyOn(bcrypt, 'compare')
+        .mockImplementation(async (password: string): Promise<boolean> => {
+          return password === 'password';
+        });
 
       const result = await authService.validateUser(
         'test@example.com',

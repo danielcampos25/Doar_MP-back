@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+  NotFoundException,
+} from '@nestjs/common';
 import { TrackingService } from './tracking.service';
 import { CreateTrackingDto } from './dto/create-tracking.dto';
 import { UpdateTrackingDto } from './dto/update-tracking.dto';
@@ -27,7 +36,10 @@ export class TrackingController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: number, @Body() updateTrackingDto: UpdateTrackingDto) {
+  async update(
+    @Param('id') id: number,
+    @Body() updateTrackingDto: UpdateTrackingDto,
+  ) {
     return this.trackingService.update(id, updateTrackingDto);
   }
 

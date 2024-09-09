@@ -5,7 +5,6 @@ import { NotFoundException } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
-
 describe('DonationsService', () => {
   let service: DonationsService;
 
@@ -20,6 +19,12 @@ describe('DonationsService', () => {
     entregue: false,
   };
 
+  const mockUser = {
+    id: 1,
+    nome: 'Usuário de Teste',
+    email: 'userteste@unb.br',
+  };
+
   const mockPrismaService = {
     doacao: {
       create: jest.fn().mockResolvedValue(mockDonation),
@@ -27,6 +32,9 @@ describe('DonationsService', () => {
       findMany: jest.fn().mockResolvedValue([mockDonation]),
       update: jest.fn().mockResolvedValue(mockDonation),
       delete: jest.fn().mockResolvedValue(mockDonation),
+    },
+    usuario: {
+      findUnique: jest.fn().mockResolvedValue(mockUser),
     },
   };
 
@@ -115,7 +123,9 @@ describe('DonationsService', () => {
 
   describe('entregaConcluida', () => {
     it('should mark a donation as delivered', async () => {
-      mockPrismaService.doacao.findUnique.mockResolvedValueOnce(mockDonation); // Mocking here
+      mockPrismaService.doacao.findUnique.mockResolvedValueOnce(mockDonation);
+      mockPrismaService.usuario.findUnique.mockResolvedValueOnce(mockUser);
+
       const result = await service.entregaConcluida(1);
       expect(result).toEqual(mockDonation);
       expect(mockPrismaService.doacao.update).toHaveBeenCalledWith({
@@ -126,7 +136,9 @@ describe('DonationsService', () => {
 
     it('should throw NotFoundException if donation not found', async () => {
       mockPrismaService.doacao.findUnique.mockResolvedValueOnce(null);
-      await expect(service.entregaConcluida(2)).rejects.toThrow(NotFoundException);
+      await expect(service.entregaConcluida(2)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

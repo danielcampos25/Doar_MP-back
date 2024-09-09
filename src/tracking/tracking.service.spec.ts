@@ -3,7 +3,6 @@ import { TrackingService } from './tracking.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTrackingDto } from './dto/create-tracking.dto';
 import { UpdateTrackingDto } from './dto/update-tracking.dto';
-import { NotFoundException } from '@nestjs/common';
 
 describe('TrackingService', () => {
   let service: TrackingService;
@@ -18,10 +17,20 @@ describe('TrackingService', () => {
     updatedAt: new Date(),
   };
 
+  const mockDonationData = {
+    id: 1,
+    usuario: { id: 1, nome: 'User de Teste', email: 'test@example.com' },
+  };
+
   const mockPrismaService = {
     rastreamento: {
       create: jest.fn((dto: CreateTrackingDto) => {
-        return { id: mockTrackingData.id, ...dto, createdAt: new Date(), updatedAt: new Date() };
+        return {
+          id: mockTrackingData.id,
+          ...dto,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
       }),
       findMany: jest.fn((params = { where: { doacaoID: 1 } }) => {
         if (params.where.doacaoID === 1) {
@@ -46,6 +55,14 @@ describe('TrackingService', () => {
           return { id: mockTrackingData.id };
         }
         throw new Error('Tracking not found');
+      }),
+    },
+    doacao: {
+      findUnique: jest.fn().mockImplementation((params) => {
+        if (params.where.id === 1) {
+          return mockDonationData;
+        }
+        return null;
       }),
     },
   };
@@ -76,17 +93,16 @@ describe('TrackingService', () => {
         localizacao: 'Location A',
         status: 'In Progress',
       };
-  
+
       const result = await service.create(createTrackingDto);
-  
-      // Ajuste na expectativa
+
       expect(result).toEqual({
         id: 1,
         ...createTrackingDto,
         createdAt: expect.any(Date),
         updatedAt: expect.any(Date),
       });
-  
+
       expect(prisma.rastreamento.create).toHaveBeenCalledWith({
         data: createTrackingDto,
       });
@@ -163,6 +179,8 @@ describe('TrackingService', () => {
     });
 
     it('should throw an error if no trackings found for donation id', async () => {
+      prisma.rastreamento.findMany = jest.fn().mockReturnValueOnce([]);
+
       await expect(service.findByDonationId(2)).rejects.toThrowError(
         'No tracking found for donation ID 2',
       );

@@ -3,7 +3,7 @@ import { CreateDonationDto } from './dto/create-donation.dto';
 import { UpdateDonationDto } from './dto/update-donation.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { DonationEntity } from './entities/donation.entity';
-import transporter from 'src/nodemailer';
+import transporter from '../nodemailer';
 @Injectable()
 export class DonationsService {
   constructor(private readonly prisma: PrismaService) {}
@@ -40,7 +40,10 @@ export class DonationsService {
     return donation;
   }
 
-  async update(id: number, updateDonationDto: UpdateDonationDto): Promise<DonationEntity> {
+  async update(
+    id: number,
+    updateDonationDto: UpdateDonationDto,
+  ): Promise<DonationEntity> {
     const donation = await this.prisma.doacao.update({
       where: { id },
       data: {
@@ -87,24 +90,23 @@ export class DonationsService {
       },
     });
 
-    // Supondo que o email do usuário esteja relacionado ao ID do usuário
     const user = await this.prisma.usuario.findUnique({
       where: { id: donation.usuarioID },
     });
 
     if (user && user.email) {
       await transporter.sendMail({
-        from: 'doarpontocom@gmail.com', 
-        to: user.email, 
+        from: 'doarpontocom@gmail.com',
+        to: user.email,
         subject: 'Entrega confirmada',
         text: `A entrega do pedido ${id} foi confirmada com sucesso, visite o site para acompanhar as imagens de entrega.`,
       });
     } else {
-      throw new NotFoundException(`Email do usuário com ID ${donation.usuarioID} não encontrado`);
+      throw new NotFoundException(
+        `Email do usuário com ID ${donation.usuarioID} não encontrado`,
+      );
     }
 
     return updatedDonation;
   }
-
-  
 }
