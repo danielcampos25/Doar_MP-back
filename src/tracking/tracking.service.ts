@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTrackingDto } from './dto/create-tracking.dto';
 import { UpdateTrackingDto } from './dto/update-tracking.dto';
-import transporter from 'src/nodemailer';
+import transporter from '../nodemailer';
 @Injectable()
 export class TrackingService {
   constructor(private readonly prisma: PrismaService) {}
@@ -14,27 +14,31 @@ export class TrackingService {
 
     // Obter a doação associada ao rastreamento
     const donation = await this.prisma.doacao.findUnique({
-      where: { id: tracking.doacaoID },
+      where: { id: createTrackingDto.doacaoID },
       include: {
         usuario: true, // Inclui o usuário associado
       },
     });
 
     if (!donation) {
-      throw new NotFoundException(`Doação com ID ${tracking.doacaoID} não encontrada.`);
+      throw new NotFoundException(
+        `Doação com ID ${tracking.doacaoID} não encontrada.`,
+      );
     }
 
     // Verifica se o usuário existe e tem um e-mail válido
     if (donation.usuario && donation.usuario.email) {
       await transporter.sendMail({
         from: 'doarpontocom@gmail.com',
-        to: donation.usuario.email, 
+        to: donation.usuario.email,
         subject: 'Novo Rastreamento Criado',
         text: `O objeto doado de id ${tracking.doacaoID} esta em 
         localização: "${tracking.localizacao}".`,
       });
     } else {
-      throw new NotFoundException(`Email do usuário com ID ${donation.usuarioID} não encontrado.`);
+      throw new NotFoundException(
+        `Email do usuário com ID ${donation.usuarioID} não encontrado.`,
+      );
     }
 
     return {
@@ -79,10 +83,11 @@ export class TrackingService {
   }
   async findByDonationId(doacaoID: number) {
     const trackings = await this.prisma.rastreamento.findMany({
-      where: {
-        doacaoID: doacaoID, // Certifique-se de que doacaoID é um número
-      },
+      where: { doacaoID },
     });
+    if (trackings.length === 0) {
+      throw new Error(`No tracking found for donation ID ${doacaoID}`);
+    }
     return trackings;
   }
 }

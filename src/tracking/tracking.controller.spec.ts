@@ -4,6 +4,7 @@ import { TrackingService } from './tracking.service';
 import { CreateTrackingDto } from './dto/create-tracking.dto';
 import { UpdateTrackingDto } from './dto/update-tracking.dto';
 import { NotFoundException } from '@nestjs/common';
+
 describe('TrackingController', () => {
   let controller: TrackingController;
   let service: TrackingService;
@@ -34,7 +35,9 @@ describe('TrackingController', () => {
       if (doacaoID === 1) {
         return [{ id: 1, localizacao: 'Location A', status: 'In Progress' }];
       }
-      throw new NotFoundException(`No tracking found for donation ID ${doacaoID}`);
+      throw new NotFoundException(
+        `No tracking found for donation ID ${doacaoID}`,
+      );
     }),
   };
 
