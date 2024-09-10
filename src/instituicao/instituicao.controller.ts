@@ -21,35 +21,51 @@ import { OwnershipGuard } from '../auth/guards/ownershipGuard.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { Response } from 'express';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
+@ApiTags('Instituições')
 @Controller('instituicoes')
 export class InstituicaoController {
   constructor(private readonly instituicaoService: InstituicaoService) {}
 
   @Public()
   @Post()
+  @ApiOperation({ summary: 'Cria uma nova instituição'})
+  @ApiResponse({ status: 201, description: 'Instituição criada com sucesso'})
+  @ApiResponse({ status: 400, description: 'Dados invalidos'})
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createInstituicaoDto: CreateInstituicaoDto) {
     return await this.instituicaoService.create(createInstituicaoDto);
   }
 
   @Get()
+  @ApiOperation({ summary: 'Retorna todas as instituições cadastradas'})
+  @ApiResponse({ status: 200, description: 'Lista de todas as instituições'})
   async findAll() {
     return await this.instituicaoService.findAll();
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Retorna a instituição requisitada pelo id de instituição'})
+  @ApiResponse({ status: 200, description: 'Instituição encontrada'})
+  @ApiResponse({ status: 404, description: 'Instituição não encontrada'})
   async findOne(@Param('id') id: string) {
     return await this.instituicaoService.findOne(+id); // Converte para número
   }
 
   @Get('foto/:id')
+  @ApiOperation({ summary: 'Retorna a foto da instituição requisitada'})
+  @ApiResponse({ status: 200, description: 'Foto da instituição encontrada'})
+  @ApiResponse({ status: 404, description: 'Foto da instituição não encontrada'})
   async getInstitutionPic(@Param('id') id: number, @Res() res: Response) {
     return this.instituicaoService.getInstitutionPic(+id, res);
   }
 
   @UseGuards(OwnershipGuard)
   @Patch(':id')
+  @ApiOperation({ summary: 'Atualiza uma instituição'})
+  @ApiResponse({ status: 200, description: 'Instituição atualizada com sucesso'})
+  @ApiResponse({ status: 403, description: 'Usuário não autorizado'})
   async update(
     @Param('id') id: string,
     @Body() updateInstituicaoDto: UpdateInstituicaoDto,
@@ -59,17 +75,24 @@ export class InstituicaoController {
 
   @UseGuards(OwnershipGuard)
   @Delete(':id')
+  @ApiOperation({ summary: 'Deleta uma instituição'})
+  @ApiResponse({ status: 200, description: 'Instituição deletada com sucesso'})
+  @ApiResponse({ status: 403, description: 'Usuário não autorizado'})
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string) {
     await this.instituicaoService.remove(+id); // Converte para número
   }
 
   @Post(':id/upload-photo')
+  @ApiOperation({ summary: 'Salva a foto na memória antes de salvá-la no disco'})
   @UseInterceptors(
     FileInterceptor('file', {
       storage: multer.memoryStorage(), // Armazenar o arquivo na memória antes de salvá-lo no disco
     }),
   )
+  @ApiOperation({ summary: 'Faz o upload da foto da instituição'})
+  @ApiResponse({ status: 200, description: 'Foto institucional carregada com sucesso'})
+  @ApiResponse({ status: 500, description: 'Erro ao carregar foto institucional'})
   async uploadInstitutionPic(
     @Param('id') id: string, // ID ainda como string
     @UploadedFile() file: Express.Multer.File,
