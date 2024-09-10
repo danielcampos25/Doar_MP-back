@@ -41,7 +41,7 @@ export class DonationsService {
 
     const qrCodePath = path.join(
       qrCodeDir,
-      `doacao_${donation.codigoRastreamento}.png`,
+      `doacao_${donation.id}.png`,
     );
 
     try {
