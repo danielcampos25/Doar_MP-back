@@ -53,26 +53,11 @@ model Rastreamento {
   doacaoID    Int
   localizacao String
   status      String?
-  midias      Midias[]
+  fotoRastreamento      String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   doacao Doacao @relation(fields: [doacaoID], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
-model Midias {
-  id             Int      @id @default(autoincrement())
-  rastreamentoID Int
-  tipo           String
-  url            String
-  createdAt      DateTime @default(now())
 
-  rastreamento Rastreamento @relation(fields: [rastreamentoID], references: [id], onUpdate: Cascade, onDelete: Cascade)
-}
-
-model Estatisticas {
-  id               Int @id @default(autoincrement())
-  totalCadastradas Int
-  totalEntregue    Int
-  totalItens       Int
-}

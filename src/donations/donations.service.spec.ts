@@ -56,7 +56,6 @@ describe('DonationsService', () => {
         destinatarioID: 2,
         descricao: 'Descrição da doação',
         qtdItens: 10,
-        QRCode: 'QRCodeString',
         codigoRastreamento: '12345',
         entregue: false,
       });

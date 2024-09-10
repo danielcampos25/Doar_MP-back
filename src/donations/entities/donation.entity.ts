@@ -17,8 +17,7 @@ export class DonationEntity implements Doacao {
 
   @IsNotEmpty()
   @IsInt()
-  destinatarioID: number; 
-
+  destinatarioID: number;
 
   @IsNotEmpty({ message: 'A descrição não pode estar vazia.' })
   @IsString({ message: 'A descrição deve ser uma string.' })
