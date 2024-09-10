@@ -12,73 +12,57 @@ import * as path from 'path';
 @Injectable()
 export class TrackingService {
   constructor(private readonly prisma: PrismaService) {}
-
-  async create(doacaoID: number, createTrackingDto: CreateTrackingDto, foto?: Express.Multer.File) {
-    // Adiciona o ID da doação ao DTO
-    const trackingData = {
-      ...createTrackingDto,
-      doacaoID, // Usa o ID da doação recebido como parâmetro
-    };
-
-    // Se houver uma foto, faça o upload
-    let filePath = '';
-    if (foto) {
-      filePath = await this.uploadTrackingPic(foto, doacaoID);
-      trackingData.fotoRastreamento = filePath; // Adiciona o caminho da foto ao DTO
-    }
-
+  async create(
+    doacaoID: number,
+    createTrackingDto: CreateTrackingDto,
+    foto?: Express.Multer.File, // Recebe o arquivo opcionalmente
+  ) {
+    // Crie o rastreamento primeiro
     const tracking = await this.prisma.rastreamento.create({
-      data: trackingData,
+      data: {
+        ...createTrackingDto,
+        doacaoID, // Usa o ID da doação recebido como parâmetro
+      },
     });
 
-    // Obter a doação associada ao rastreamento
+    // Faça o upload da foto, se fornecida
+    let fotoPath: string | null = null;
+    if (foto) {
+      fotoPath = await this.uploadTrackingPic(foto, tracking.id); // Usa o ID do rastreamento recém-criado
+    }
+
+    // Atualize o rastreamento com o caminho da foto
+    if (fotoPath) {
+      await this.prisma.rastreamento.update({
+        where: { id: tracking.id },
+        data: { fotoRastreamento: fotoPath }, // Atualiza o campo 'foto' com o caminho
+      });
+    }
+
+    // Enviar email
     const donation = await this.prisma.doacao.findUnique({
-      where: { id: doacaoID }, // Usa o doacaoID recebido
-      include: {
-        usuario: true, // Inclui o usuário associado
-      },
+      where: { id: doacaoID },
+      include: { usuario: true },
     });
 
     if (!donation) {
       throw new NotFoundException(`Doação com ID ${doacaoID} não encontrada.`);
     }
 
-    // Verifica se o usuário existe e tem um e-mail válido
     if (donation.usuario && donation.usuario.email) {
-      // Enviar o e-mail com a imagem embutida
-      const emailOptions = {
+      await transporter.sendMail({
         from: 'doarpontocom@gmail.com',
         to: donation.usuario.email,
         subject: 'Novo Rastreamento Criado',
-        html: `
-          <p>O objeto doado de ID ${tracking.doacaoID} está em localização: "${tracking.localizacao}".</p>
-          <p>Aqui está a imagem associada ao rastreamento:</p>
-          <img src="cid:trackingImage" alt="Imagem do rastreamento" style="max-width: 600px;"/>
-        `,
-        attachments: [
-          {
-            filename: path.basename(filePath), // Nome do arquivo da imagem
-            path: filePath, // Caminho da imagem
-            cid: 'trackingImage' // O CID que será usado no HTML
-          },
-        ],
-      };
-
-      await transporter.sendMail(emailOptions);
-    } else {
-      throw new NotFoundException(
-        `Email do usuário com ID ${donation.usuarioID} não encontrado.`,
-      );
+        text: `O objeto doado de id ${tracking.doacaoID} está em localização: "${tracking.localizacao}".`,
+        attachments: fotoPath
+          ? [{ filename: 'rastreamento.png', path: fotoPath }]
+          : [],
+      });
     }
 
-    return {
-      id: tracking.id,
-      ...trackingData,
-      createdAt: tracking.createdAt,
-      updatedAt: tracking.updatedAt,
-    };
+    return tracking;
   }
-
 
   async uploadTrackingPic(
     file: Express.Multer.File,
