@@ -12,6 +12,11 @@ export class AppController {
   @Get()
   @ApiOperation({ summary: 'Retrieve a hello message' })
   getHello(): string {
+    // Assertiva de Entrada:
+    // - Nenhum parâmetro de entrada é necessário para esta função.
+
+    // Assertiva de Saída:
+    // - Retorna uma string com uma mensagem de "hello".
     return this.appService.getHello();
   }
 }

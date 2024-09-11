@@ -49,6 +49,11 @@ export class UsersController {
     status: 400,
     description: 'Dados inválidos fornecidos',
   })
+   // Assertiva de Entrada:
+  // - `createUserDto`: Um objeto contendo `nome`, `email`, `senha`, `fotoPerfil`, e `endereco` deve ser fornecido.
+  // - Os campos devem ser válidos, e o e-mail deve ter um formato correto.
+  // Assertiva de Saída:
+  // - O sistema deve retornar o novo usuário criado com status 201 e os detalhes do usuário.
 
   async create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
@@ -73,6 +78,8 @@ export class UsersController {
       ],
     },
   })
+  // Assertiva de Saída:
+  // - O sistema deve retornar uma lista de usuários com status 200.
 
   async findAll() {
     return this.usersService.findAll();
@@ -100,6 +107,11 @@ export class UsersController {
     status: 404,
     description: 'Usuário não encontrado',
   })
+  // Assertiva de Entrada:
+  // - O parâmetro `id` deve ser um número válido correspondente ao ID do usuário.
+  // Assertiva de Saída:
+  // - Se o usuário for encontrado, retorna os detalhes do usuário com status 200.
+  // - Se não for encontrado, retorna um erro 404.
 
   async findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
@@ -117,6 +129,11 @@ export class UsersController {
     status: 404,
     description: 'Foto de perfil não encontrada',
   })
+  // Assertiva de Entrada:
+  // - O `id` fornecido deve ser válido e existir no banco de dados.
+  // Assertiva de Saída:
+  // - Se o usuário tiver uma foto de perfil, ela será retornada com status 200.
+  // - Se não houver foto de perfil, retorna erro 404.
 
   async getUserPic(@Param('id') userId: number, @Res() res: Response) {
     return this.usersService.getUserPic(+userId, res);
@@ -150,6 +167,11 @@ export class UsersController {
     status: 400,
     description: 'Dados inválidos fornecidos',
   })
+  // Assertiva de Entrada:
+  // - O `id` deve corresponder a um usuário existente.
+  // - Os dados em `updateUserDto` devem ser válidos para a atualização.
+  // Assertiva de Saída:
+  // - O sistema retorna o usuário atualizado com status 200 ou um erro 404 se o usuário não for encontrado.
 
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
@@ -168,6 +190,10 @@ export class UsersController {
     status: 404,
     description: 'Usuário não encontrado',
   })
+  // Assertiva de Entrada:
+  // - O `id` deve ser válido e correspondente a um usuário existente.
+  // Assertiva de Saída:
+  // - O usuário é removido com status 200 ou retorna erro 404 se o usuário não for encontrado.
 
   async remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
@@ -192,6 +218,12 @@ export class UsersController {
     status: 400,
     description: 'Erro ao carregar foto de perfil',
   })
+  // Assertiva de Entrada:
+  // - O `id` deve corresponder a um usuário válido.
+  // - Um arquivo de imagem deve ser enviado para upload.
+  // Assertiva de Saída:
+  // - Retorna uma mensagem de sucesso e o caminho do arquivo se o upload for bem-sucedido (status 200).
+  // - Em caso de falha, retorna erro 400.
 
   async uploadUserPic(
     @Param('id') id: string,

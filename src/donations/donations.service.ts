@@ -8,6 +8,11 @@ import transporter from 'src/nodemailer';
 export class DonationsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  //Assertivas de entrada:
+  // - 'createDonationDto': objeto que contem os dados válidos para a criação da doação
+  //Assertivas de saída:
+  // - Retorna um objeto do tipo DonationEntity contendo os dados da doação criada.
+  // - Em caso de sucesso, a doação é registrada no banco de dados com as informações fornecidas.
   async create(createDonationDto: CreateDonationDto): Promise<DonationEntity> {
     const donation = await this.prisma.doacao.create({
       data: {
@@ -24,10 +29,17 @@ export class DonationsService {
     return donation;
   }
 
+  //Assertivas de saída:
+  // - Retorna uma lista de objetos do tipo DonationEntity contendo todas as doações registradas.
   async findAll(): Promise<DonationEntity[]> {
     return this.prisma.doacao.findMany();
   }
 
+  //Assertivas de entrada:
+  // - 'id': deve ser um número não nulo que corresponda ao ID da doação
+  //Assertivas de saída:
+  // - Retorna o objeto do tipo DonationEntity correspondente ao id fornecido.
+  // - Se a doação não for encontrada, lança uma exceção NotFoundException.
   async findOne(id: number): Promise<DonationEntity> {
     const donation = await this.prisma.doacao.findUnique({
       where: { id },
@@ -40,6 +52,12 @@ export class DonationsService {
     return donation;
   }
 
+  //Assertivas de entrada:
+  // - 'id': deve ser um número não nulo que corresponda ao ID da doação
+  // - 'updateDonationDto': objeto contendo todas as informações válidas da doação ser atualizada
+  //Assertivas de saída:
+  // - Retorna o objeto atualizado do tipo DonationEntity.
+  // - Se a doação não for encontrada, lança uma exceção
   async update(id: number, updateDonationDto: UpdateDonationDto): Promise<DonationEntity> {
     const donation = await this.prisma.doacao.update({
       where: { id },
@@ -61,6 +79,11 @@ export class DonationsService {
     return donation;
   }
 
+  //Assertivas de entrada:
+  // - 'id': deve ser um número não nulo que corresponda ao ID da doação
+  //Assertivas de saída:
+  // - Se a doação não for encontrada, lança uma exceção
+  // - Não há retorno específico em caso de sucesso.
   async remove(id: number): Promise<void> {
     const donation = await this.prisma.doacao.delete({
       where: { id },
@@ -71,6 +94,12 @@ export class DonationsService {
     }
   }
 
+  //Assertivas de entrada:
+  // - 'id': deve ser um número não nulo que corresponda ao ID da doação
+  //Assertivas de saída:
+  // - Retorna o objeto do tipo DonationEntity atualizado com o campo entregue definido como true.
+  // - Envia um e-mail de confirmação ao usuário associado à doação.
+  // - Se a doação ou o e-mail do usuário não forem encontrados, lança uma exceção
   async entregaConcluida(id: number): Promise<DonationEntity> {
     const donation = await this.prisma.doacao.findUnique({
       where: { id },
