@@ -26,9 +26,8 @@ export class AppService {
     });
 
     // Calcular a porcentagem de doações entregues
-    const porcentagemEntregues = totalDoacoes > 0 
-      ? (doacoesEntregues / totalDoacoes) * 100 
-      : 0; // Evitar divisão por zero
+    const porcentagemEntregues =
+      totalDoacoes > 0 ? (doacoesEntregues / totalDoacoes) * 100 : 0; // Evitar divisão por zero
 
     // Retornar o resultado das contagens
     return {
@@ -37,7 +36,7 @@ export class AppService {
       totalDoacoes,
       totalItensDoacao: totalItensDoacao._sum.qtdItens || 0, // Retorna 0 se não houver itens
       doacoesEntregues, // Adiciona a contagem de doações entregues
-      porcentagemEntregues: porcentagemEntregues.toFixed(2) // Retorna a porcentagem com 2 casas decimais
+      porcentagemEntregues: porcentagemEntregues.toFixed(2), // Retorna a porcentagem com 2 casas decimais
     };
   }
 
