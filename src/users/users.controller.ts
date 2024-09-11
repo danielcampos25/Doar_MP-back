@@ -10,7 +10,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Res,
-  HttpStatus
+  HttpStatus,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -32,9 +32,9 @@ export class UsersController {
     @Body() createUserDto: CreateUserDto,
     @UploadedFile() fotoPerfil: Express.Multer.File,
   ) {
+    console.log('Arquivo recebido no controlador:', fotoPerfil); // Verifique se o arquivo chega aqui
     return this.usersService.create(createUserDto, fotoPerfil);
   }
-
 
   @Get()
   async findAll() {
@@ -68,13 +68,18 @@ export class UsersController {
   async uploadUserPic(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     try {
       const filePath = await this.usersService.uploadUserPic(file, Number(id));
-      return res.json({ message: 'Foto de perfil carregada com sucesso', filePath });
+      return res.json({
+        message: 'Foto de perfil carregada com sucesso',
+        filePath,
+      });
     } catch (error) {
-      return res.status(error.status || HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
+      return res
+        .status(error.status || HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: error.message });
     }
   }
 }

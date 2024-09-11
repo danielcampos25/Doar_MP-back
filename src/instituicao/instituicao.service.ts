@@ -85,6 +85,21 @@ export class InstituicaoService {
     return this.findInstituicao({ email });
   }
 
+  async getDonations(id: number) {
+    const instituicao = await this.prisma.instituicao.findUnique({
+      where: { id },
+      include: {
+        doacoes: true, // Incluir doações associadas
+      },
+    });
+
+    if (!instituicao) {
+      throw new NotFoundException('Instituição não encontrada.');
+    }
+
+    return instituicao.doacoes;
+  }
+
   async update(
     id: number,
     updateInstituicaoDto: UpdateInstituicaoDto,

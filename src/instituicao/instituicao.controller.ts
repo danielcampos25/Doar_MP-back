@@ -41,6 +41,11 @@ export class InstituicaoController {
     return await this.instituicaoService.findAll();
   }
 
+  @Get(':id/doacoes')
+  async getDonations(@Param('id') id: string) {
+    return await this.instituicaoService.getDonations(+id); // Converte o ID para número
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.instituicaoService.findOne(+id); // Converte para número

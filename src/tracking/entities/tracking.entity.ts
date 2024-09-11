@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsString,
   IsDate,
+  IsOptional
 } from 'class-validator';
 
 export class TrackingEntity implements Rastreamento {
@@ -22,8 +23,11 @@ export class TrackingEntity implements Rastreamento {
   @IsString({ message: 'O status deve ser uma string.' })
   status: string;
 
-  // Assumindo que `Midias[]` é um array de IDs ou objetos, ajuste conforme necessário
-  //midias: any[];
+  @IsOptional()
+  @IsString({
+    message: 'A foto de rastreamento deve ser armazenada como uma string.',
+  })
+  fotoRastreamento: string;
 
   @IsDate()
   createdAt: Date;

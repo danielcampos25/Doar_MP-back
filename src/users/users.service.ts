@@ -14,8 +14,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as mime from 'mime-types';
 
-
-
 const UserSelection = {
   id: true,
   nome: true,
@@ -32,13 +30,13 @@ export class UsersService {
     const existingUser = await this.prisma.usuario.findUnique({
       where: { email: createUserDto.email },
     });
-  
+
     if (existingUser) {
       throw new ConflictException('Este e-mail já está em uso.');
     }
-  
+
     const hashedPassword = await bcrypt.hash(createUserDto.senha, 10);
-  
+
     const createdUser = await this.prisma.usuario.create({
       data: {
         ...createUserDto,
@@ -46,12 +44,13 @@ export class UsersService {
       },
       select: UserSelection,
     });
-  
+
     // Se houver foto de perfil, faça o upload após a criação do usuário
     if (fotoPerfil) {
       await this.uploadUserPic(fotoPerfil, createdUser.id);
     }
-  
+    console.log('foto de perfil', fotoPerfil);
+
     return createdUser;
   }
 
@@ -129,18 +128,27 @@ export class UsersService {
     });
   }
 
-  async uploadUserPic(file: Express.Multer.File, userId: number): Promise<string> {
+  async uploadUserPic(
+    file: Express.Multer.File,
+    userId: number,
+  ): Promise<string> {
     if (!file) {
       throw new BadRequestException('Arquivo não fornecido');
     }
 
-    const uploadDir = path.join(__dirname, '..', '..', 'uploads', 'upload-user-photo');
+    const uploadDir = path.join(
+      __dirname,
+      '..',
+      '..',
+      'uploads',
+      'upload-user-photo',
+    );
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
 
     const filePath = path.join(uploadDir, `${userId}-${file.originalname}`);
-    
+
     // Salvar o arquivo
     fs.writeFileSync(filePath, file.buffer);
 
@@ -158,21 +166,21 @@ export class UsersService {
       where: { id: userId },
       select: { fotoPerfil: true }, // Pegando apenas a foto de perfil
     });
-  
+
     if (!user || !user.fotoPerfil) {
       throw new NotFoundException('Foto de perfil não encontrada.');
     }
-  
+
     const filePath = user.fotoPerfil;
-  
+
     if (!fs.existsSync(filePath)) {
       throw new NotFoundException('Arquivo de imagem não encontrado.');
     }
-  
+
     // Detecta o tipo MIME da imagem
     const mimeType = mime.lookup(filePath) || 'application/octet-stream';
     res.setHeader('Content-Type', mimeType);
-  
+
     // Faz o streaming do arquivo de imagem
     fs.createReadStream(filePath).pipe(res);
   }
