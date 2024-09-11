@@ -30,6 +30,9 @@ export class AppService {
       ? (doacoesEntregues / totalDoacoes) * 100 
       : 0; // Evitar divisão por zero
 
+    // Persistir os dados na tabela Estatisticas
+    await this.atualizarEstatisticas(totalDoacoes, doacoesEntregues, totalItensDoacao._sum.quantidadeItens || 0);
+
     return {
       totalUsuarios,
       totalInstituicoes,
@@ -38,6 +41,33 @@ export class AppService {
       doacoesEntregues, // Adiciona a contagem de doações entregues
       porcentagemEntregues: porcentagemEntregues.toFixed(2) // Retorna a porcentagem com 2 casas decimais
     };
+  }
+
+  // Função para atualizar ou criar as estatísticas
+  private async atualizarEstatisticas(totalCadastradas: number, totalEntregue: number, totalItens: number) {
+    // Verificar se já existe um registro de estatísticas
+    const estatisticasExistentes = await this.prisma.estatisticas.findFirst();
+
+    if (estatisticasExistentes) {
+      // Atualizar as estatísticas existentes
+      await this.prisma.estatisticas.update({
+        where: { id: estatisticasExistentes.id },
+        data: {
+          totalCadastradas,
+          totalEntregue,
+          totalItens,
+        },
+      });
+    } else {
+      // Criar novo registro de estatísticas
+      await this.prisma.estatisticas.create({
+        data: {
+          totalCadastradas,
+          totalEntregue,
+          totalItens,
+        },
+      });
+    }
   }
 
   getHello(): string {
