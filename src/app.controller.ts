@@ -11,4 +11,11 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  // Nova rota para retornar as contagens das tabelas
+  @Public()
+  @Get('contagens')
+  async obterContagens() {
+    return this.appService.contarLinhasTabelas();
+  }
 }
