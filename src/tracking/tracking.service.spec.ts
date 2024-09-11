@@ -88,23 +88,28 @@ describe('TrackingService', () => {
 
   describe('create', () => {
     it('should create a tracking', async () => {
+      const doacaoID = 1; // Defina o doacaoID apropriado
       const createTrackingDto: CreateTrackingDto = {
-        doacaoID: 1,
         localizacao: 'Location A',
         status: 'In Progress',
+        fotoRastreamento: 'test.png',
       };
 
-      const result = await service.create(createTrackingDto);
+      const result = await service.create(doacaoID, createTrackingDto);
 
       expect(result).toEqual({
         id: 1,
+        doacaoID: doacaoID,
         ...createTrackingDto,
         createdAt: expect.any(Date),
         updatedAt: expect.any(Date),
       });
 
       expect(prisma.rastreamento.create).toHaveBeenCalledWith({
-        data: createTrackingDto,
+        data: {
+          ...createTrackingDto,
+          doacaoID, // Inclua doacaoID na criação
+        },
       });
     });
   });

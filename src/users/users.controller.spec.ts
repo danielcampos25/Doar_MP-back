@@ -17,7 +17,12 @@ describe('UsersController', () => {
       controllers: [UsersController],
       providers: [
         PrismaService,
-        OwnershipGuard,
+        {
+          provide: OwnershipGuard,
+          useValue: {
+            canActivate: jest.fn(() => true), // Mock do guard para permitir execução
+          },
+        },
         InstituicaoService,
         {
           provide: UsersService,
@@ -115,7 +120,7 @@ describe('UsersController', () => {
 
       jest.spyOn(usersService, 'findOne').mockResolvedValue(user);
 
-      const result = await usersController.findOne('1');
+      const result = await usersController.findOne(1); // Alterado de string para número
       expect(result).toEqual(user);
       expect(usersService.findOne).toHaveBeenCalledWith(1);
     });
@@ -125,7 +130,7 @@ describe('UsersController', () => {
         .spyOn(usersService, 'findOne')
         .mockRejectedValue(new NotFoundException('Usuário não encontrado.'));
 
-      await expect(usersController.findOne('1')).rejects.toThrow(
+      await expect(usersController.findOne(1)).rejects.toThrow(
         NotFoundException,
       );
       expect(usersService.findOne).toHaveBeenCalledWith(1);
@@ -145,7 +150,7 @@ describe('UsersController', () => {
 
       jest.spyOn(usersService, 'update').mockResolvedValue(updatedUser);
 
-      const result = await usersController.update('1', updateUserDto);
+      const result = await usersController.update(1, updateUserDto); // Alterado de string para número
       expect(result).toEqual(updatedUser);
       expect(usersService.update).toHaveBeenCalledWith(1, updateUserDto);
     });
@@ -157,7 +162,7 @@ describe('UsersController', () => {
         .spyOn(usersService, 'update')
         .mockRejectedValue(new NotFoundException('Usuário não encontrado.'));
 
-      await expect(usersController.update('1', updateUserDto)).rejects.toThrow(
+      await expect(usersController.update(1, updateUserDto)).rejects.toThrow(
         NotFoundException,
       );
       expect(usersService.update).toHaveBeenCalledWith(1, updateUserDto);
@@ -174,7 +179,7 @@ describe('UsersController', () => {
           ),
         );
 
-      await expect(usersController.update('1', updateUserDto)).rejects.toThrow(
+      await expect(usersController.update(1, updateUserDto)).rejects.toThrow(
         ConflictException,
       );
       expect(usersService.update).toHaveBeenCalledWith(1, updateUserDto);
@@ -193,7 +198,7 @@ describe('UsersController', () => {
 
       jest.spyOn(usersService, 'remove').mockResolvedValue(user);
 
-      const result = await usersController.remove('1');
+      const result = await usersController.remove(1); // Alterado de string para número
       expect(result).toEqual(user);
       expect(usersService.remove).toHaveBeenCalledWith(1);
     });
@@ -203,7 +208,7 @@ describe('UsersController', () => {
         .spyOn(usersService, 'remove')
         .mockRejectedValue(new NotFoundException('Usuário não encontrado.'));
 
-      await expect(usersController.remove('1')).rejects.toThrow(
+      await expect(usersController.remove(1)).rejects.toThrow(
         NotFoundException,
       );
       expect(usersService.remove).toHaveBeenCalledWith(1);

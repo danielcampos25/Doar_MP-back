@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DonationsService } from './donations.service';
 import { DonationEntity } from './entities/donation.entity';
 import { NotFoundException } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 describe('DonationsService', () => {
@@ -58,6 +57,7 @@ describe('DonationsService', () => {
         qtdItens: 10,
         codigoRastreamento: '12345',
         entregue: false,
+        titulo: 'titulo',
       });
 
       expect(result).toEqual(mockDonation);
@@ -67,9 +67,10 @@ describe('DonationsService', () => {
           destinatarioID: 2,
           descricao: 'Descrição da doação',
           qtdItens: 10,
-          QRCode: 'QRCodeString',
+          QRCode: '',
           codigoRastreamento: '12345',
           entregue: false,
+          titulo: 'titulo',
         },
       });
     });
@@ -85,7 +86,7 @@ describe('DonationsService', () => {
 
   describe('findOne', () => {
     it('should return a donation', async () => {
-      mockPrismaService.doacao.findUnique.mockResolvedValueOnce(mockDonation); // Mocking here
+      mockPrismaService.doacao.findUnique.mockResolvedValueOnce(mockDonation);
       const result = await service.findOne(1);
       expect(result).toEqual(mockDonation);
       expect(mockPrismaService.doacao.findUnique).toHaveBeenCalledWith({
@@ -96,17 +97,31 @@ describe('DonationsService', () => {
     it('should throw NotFoundException if donation not found', async () => {
       mockPrismaService.doacao.findUnique.mockResolvedValueOnce(null);
       await expect(service.findOne(2)).rejects.toThrow(NotFoundException);
+      expect(mockPrismaService.doacao.findUnique).toHaveBeenCalledWith({
+        where: { id: 2 },
+      });
     });
   });
 
   describe('update', () => {
     it('should update a donation', async () => {
-      const result = await service.update(1, { descricao: 'Nova descrição' });
+      const updatedDonationData = { descricao: 'Nova descrição' };
+      const result = await service.update(1, updatedDonationData);
+
       expect(result).toEqual(mockDonation);
       expect(mockPrismaService.doacao.update).toHaveBeenCalledWith({
         where: { id: 1 },
-        data: { descricao: 'Nova descrição' },
+        data: updatedDonationData,
       });
+    });
+
+    it('should throw NotFoundException if donation not found', async () => {
+      mockPrismaService.doacao.update.mockRejectedValueOnce(
+        new NotFoundException('Doação não encontrada.'),
+      );
+      await expect(
+        service.update(2, { descricao: 'Nova descrição' }),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -117,6 +132,13 @@ describe('DonationsService', () => {
       expect(mockPrismaService.doacao.delete).toHaveBeenCalledWith({
         where: { id: 1 },
       });
+    });
+
+    it('should throw NotFoundException if donation not found', async () => {
+      mockPrismaService.doacao.delete.mockRejectedValueOnce(
+        new NotFoundException('Doação não encontrada.'),
+      );
+      await expect(service.remove(2)).rejects.toThrow(NotFoundException);
     });
   });
 
