@@ -26,41 +26,7 @@ const UserSelection = {
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // Função que retorna a contagem de linhas nas tabelas, incluindo doações entregues e a porcentagem
-  async contarLinhasTabelas() {
-    const totalUsuarios = await this.prisma.usuario.count();
-    const totalInstituicoes = await this.prisma.instituicao.count();
-    const totalDoacoes = await this.prisma.doacao.count();
-
-    // Supondo que a tabela doacao tem uma coluna "quantidadeItens"
-    const totalItensDoacao = await this.prisma.doacao.aggregate({
-      _sum: {
-        quantidadeItens: true,
-      },
-    });
-
-    // Contar doações entregues (supondo que exista uma coluna `entregue`)
-    const doacoesEntregues = await this.prisma.doacao.count({
-      where: {
-        entregue: true, // Condição para doações que foram entregues
-      },
-    });
-
-    // Calcular a porcentagem de doações entregues
-    const porcentagemEntregues = totalDoacoes > 0 
-      ? (doacoesEntregues / totalDoacoes) * 100 
-      : 0; // Evitar divisão por zero
-
-    return {
-      totalUsuarios,
-      totalInstituicoes,
-      totalDoacoes,
-      totalItensDoacao: totalItensDoacao._sum.quantidadeItens || 0, // Retorna 0 se não houver itens
-      doacoesEntregues, // Adiciona a contagem de doações entregues
-      porcentagemEntregues: porcentagemEntregues.toFixed(2) // Retorna a porcentagem com 2 casas decimais
-    };
-  }
-
+  // Função para criar um novo usuário
   async create(createUserDto: CreateUserDto) {
     const existingUser = await this.prisma.usuario.findUnique({
       where: { email: createUserDto.email },
@@ -77,12 +43,14 @@ export class UsersService {
     });
   }
 
+  // Função para listar todos os usuários
   async findAll() {
     return await this.prisma.usuario.findMany({
       select: UserSelection,
     });
   }
 
+  // Função para encontrar um único usuário pelo ID
   private async findUser(criterio: Prisma.UsuarioWhereUniqueInput) {
     if (!criterio.id && !criterio.email) {
       throw new BadRequestException(
@@ -108,6 +76,7 @@ export class UsersService {
     return this.findUser({ email });
   }
 
+  // Função para atualizar um usuário
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.prisma.usuario.findUnique({ where: { id } });
 
@@ -138,6 +107,7 @@ export class UsersService {
     });
   }
 
+  // Função para remover um usuário
   async remove(id: number) {
     const user = await this.prisma.usuario.findUnique({ where: { id } });
 
@@ -151,6 +121,7 @@ export class UsersService {
     });
   }
 
+  // Função para upload de foto de perfil do usuário
   async uploadUserPic(file: Express.Multer.File, userId: number): Promise<string> {
     if (!file) {
       throw new BadRequestException('Arquivo não fornecido');
@@ -175,6 +146,7 @@ export class UsersService {
     return filePath; // Retorne o caminho do arquivo salvo
   }
 
+  // Função para obter a foto de perfil de um usuário
   async getUserPic(userId: number, res): Promise<void> {
     const user = await this.prisma.usuario.findUnique({
       where: { id: userId },

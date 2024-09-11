@@ -2,15 +2,15 @@ import {
   Controller,
   Get,
   Post,
-  Body,
   Patch,
   Param,
   Delete,
+  Body,
   UseGuards,
   UseInterceptors,
   UploadedFile,
   Res,
-  HttpStatus
+  HttpStatus,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -70,11 +70,5 @@ export class UsersController {
     } catch (error) {
       return res.status(error.status || HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
-  }
-
-  // Nova rota para retornar as contagens das tabelas
-  @Get('contagens')
-  async obterContagens() {
-    return this.usersService.contarLinhasTabelas();
   }
 }
