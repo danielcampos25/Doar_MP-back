@@ -26,7 +26,7 @@ const UserSelection = {
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // Função que retorna a contagem de linhas nas tabelas, incluindo doações entregues
+  // Função que retorna a contagem de linhas nas tabelas, incluindo doações entregues e a porcentagem
   async contarLinhasTabelas() {
     const totalUsuarios = await this.prisma.usuario.count();
     const totalInstituicoes = await this.prisma.instituicao.count();
@@ -46,12 +46,18 @@ export class UsersService {
       },
     });
 
+    // Calcular a porcentagem de doações entregues
+    const porcentagemEntregues = totalDoacoes > 0 
+      ? (doacoesEntregues / totalDoacoes) * 100 
+      : 0; // Evitar divisão por zero
+
     return {
       totalUsuarios,
       totalInstituicoes,
       totalDoacoes,
       totalItensDoacao: totalItensDoacao._sum.quantidadeItens || 0, // Retorna 0 se não houver itens
       doacoesEntregues, // Adiciona a contagem de doações entregues
+      porcentagemEntregues: porcentagemEntregues.toFixed(2) // Retorna a porcentagem com 2 casas decimais
     };
   }
 
