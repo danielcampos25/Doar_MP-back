@@ -23,6 +23,10 @@ export class DonationEntity implements Doacao {
   @IsString({ message: 'A descrição deve ser uma string.' })
   descricao: string;
 
+  @IsNotEmpty({ message: 'O titulo não pode estar vazio.' })
+  @IsString({ message: 'O titulo deve ser uma string.' })
+  titulo: string;
+
   @IsNotEmpty({ message: 'A quantidade de itens não pode estar vazia.' })
   @IsInt({ message: 'A quantidade de itens deve ser um número.' })
   qtdItens: number;

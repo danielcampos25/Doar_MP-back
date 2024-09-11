@@ -36,6 +36,7 @@ model Doacao {
   usuarioID          Int
   destinatarioID     Int
   descricao          String
+  titulo             String?
   qtdItens           Int
   QRCode             String
   codigoRastreamento String

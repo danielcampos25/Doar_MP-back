@@ -28,6 +28,11 @@ export class DonationsController {
     return this.donationsService.findAll();
   }
 
+  @Get('user/:userId')
+  findByUser(@Param('userId') userId: string): Promise<DonationEntity[]> {
+    return this.donationsService.findByUser(Number(userId));
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string): Promise<DonationEntity> {
     return this.donationsService.findOne(Number(id));
