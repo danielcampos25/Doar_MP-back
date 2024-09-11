@@ -146,7 +146,7 @@ export class DonationsService {
         from: 'doarpontocom@gmail.com',
         to: user.email,
         subject: 'Entrega confirmada',
-        text: `A entrega do pedido ${id} foi confirmada com sucesso, visite o site para acompanhar as imagens de entrega.`,
+        text: `A entrega do pedido ${id} foi confirmada com sucesso.`,
       });
     } else {
       throw new NotFoundException(
