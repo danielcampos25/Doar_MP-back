@@ -26,7 +26,7 @@ const UserSelection = {
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // Função que retorna a contagem de linhas nas tabelas
+  // Função que retorna a contagem de linhas nas tabelas, incluindo doações entregues
   async contarLinhasTabelas() {
     const totalUsuarios = await this.prisma.usuario.count();
     const totalInstituicoes = await this.prisma.instituicao.count();
@@ -39,11 +39,19 @@ export class UsersService {
       },
     });
 
+    // Contar doações entregues (supondo que exista uma coluna `entregue`)
+    const doacoesEntregues = await this.prisma.doacao.count({
+      where: {
+        entregue: true, // Condição para doações que foram entregues
+      },
+    });
+
     return {
       totalUsuarios,
       totalInstituicoes,
       totalDoacoes,
       totalItensDoacao: totalItensDoacao._sum.quantidadeItens || 0, // Retorna 0 se não houver itens
+      doacoesEntregues, // Adiciona a contagem de doações entregues
     };
   }
 
