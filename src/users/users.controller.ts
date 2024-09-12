@@ -18,7 +18,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Public } from '../auth/decorators/isPublic.decorator';
 import { OwnershipGuard } from '../auth/guards/ownershipGuard.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as multer from 'multer';
+// import * as multer from 'multer';
 import { Response } from 'express';
 
 @Controller('users')
@@ -32,7 +32,7 @@ export class UsersController {
     @Body() createUserDto: CreateUserDto,
     @UploadedFile() fotoPerfil: Express.Multer.File,
   ) {
-    console.log('Arquivo recebido no controlador:', fotoPerfil); // Verifique se o arquivo chega aqui
+    // console.log('Arquivo recebido no controlador:', fotoPerfil);
     return this.usersService.create(createUserDto, fotoPerfil);
   }
 

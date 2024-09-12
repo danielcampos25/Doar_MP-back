@@ -79,7 +79,7 @@ describe('InstituicaoController', () => {
 
   describe('findOne', () => {
     it('should return a single institution', async () => {
-      const result = await controller.findOne(1); // Corrigido para passar um número
+      const result = await controller.findOne('1');
       expect(result).toEqual(mockInstituicao);
       expect(service.findOne).toHaveBeenCalledWith(1);
     });

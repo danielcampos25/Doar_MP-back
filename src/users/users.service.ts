@@ -49,7 +49,7 @@ export class UsersService {
     if (fotoPerfil) {
       await this.uploadUserPic(fotoPerfil, createdUser.id);
     }
-    console.log('foto de perfil', fotoPerfil);
+    // console.log('foto de perfil', fotoPerfil);
 
     return createdUser;
   }

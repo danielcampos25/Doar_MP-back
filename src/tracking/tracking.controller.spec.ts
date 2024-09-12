@@ -65,10 +65,21 @@ describe('TrackingController', () => {
       const createTrackingDto: CreateTrackingDto = {
         localizacao: 'Location A',
         status: 'In Progress',
-        doacaoID: 1,
+        fotoRastreamento: 'Foto Rastreamento',
+        // doacaoID: 1,
       };
 
-      expect(await controller.create(createTrackingDto)).toEqual({
+      expect(
+        await controller.create(
+          1,
+          {
+            localizacao: 'Location A',
+            status: 'In Progress',
+            fotoRastreamento: 'Foto Rastreamento',
+          },
+          {} as Express.Multer.File,
+        ),
+      ).toEqual({
         id: 1,
         ...createTrackingDto,
       });

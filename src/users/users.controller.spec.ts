@@ -58,9 +58,12 @@ describe('UsersController', () => {
 
       jest.spyOn(usersService, 'create').mockResolvedValue(createdUser);
 
-      const result = await usersController.create(createUserDto);
+      const result = await usersController.create(
+        createUserDto,
+        {} as Express.Multer.File,
+      );
       expect(result).toEqual(createdUser);
-      expect(usersService.create).toHaveBeenCalledWith(createUserDto);
+      expect(usersService.create).toHaveBeenCalledWith(createUserDto, {});
     });
 
     it('should throw a ConflictException if the email is already in use', async () => {
@@ -78,10 +81,10 @@ describe('UsersController', () => {
           new ConflictException('Este e-mail já está em uso.'),
         );
 
-      await expect(usersController.create(createUserDto)).rejects.toThrow(
-        ConflictException,
-      );
-      expect(usersService.create).toHaveBeenCalledWith(createUserDto);
+      await expect(
+        usersController.create(createUserDto, {} as Express.Multer.File),
+      ).rejects.toThrow(ConflictException);
+      expect(usersService.create).toHaveBeenCalledWith(createUserDto, {});
     });
   });
 
@@ -120,7 +123,7 @@ describe('UsersController', () => {
 
       jest.spyOn(usersService, 'findOne').mockResolvedValue(user);
 
-      const result = await usersController.findOne(1); // Alterado de string para número
+      const result = await usersController.findOne('1'); // Alterado de string para número
       expect(result).toEqual(user);
       expect(usersService.findOne).toHaveBeenCalledWith(1);
     });
@@ -130,7 +133,7 @@ describe('UsersController', () => {
         .spyOn(usersService, 'findOne')
         .mockRejectedValue(new NotFoundException('Usuário não encontrado.'));
 
-      await expect(usersController.findOne(1)).rejects.toThrow(
+      await expect(usersController.findOne('1')).rejects.toThrow(
         NotFoundException,
       );
       expect(usersService.findOne).toHaveBeenCalledWith(1);
@@ -150,7 +153,7 @@ describe('UsersController', () => {
 
       jest.spyOn(usersService, 'update').mockResolvedValue(updatedUser);
 
-      const result = await usersController.update(1, updateUserDto); // Alterado de string para número
+      const result = await usersController.update('1', updateUserDto); // Alterado de string para número
       expect(result).toEqual(updatedUser);
       expect(usersService.update).toHaveBeenCalledWith(1, updateUserDto);
     });
@@ -162,7 +165,7 @@ describe('UsersController', () => {
         .spyOn(usersService, 'update')
         .mockRejectedValue(new NotFoundException('Usuário não encontrado.'));
 
-      await expect(usersController.update(1, updateUserDto)).rejects.toThrow(
+      await expect(usersController.update('1', updateUserDto)).rejects.toThrow(
         NotFoundException,
       );
       expect(usersService.update).toHaveBeenCalledWith(1, updateUserDto);
@@ -179,7 +182,7 @@ describe('UsersController', () => {
           ),
         );
 
-      await expect(usersController.update(1, updateUserDto)).rejects.toThrow(
+      await expect(usersController.update('1', updateUserDto)).rejects.toThrow(
         ConflictException,
       );
       expect(usersService.update).toHaveBeenCalledWith(1, updateUserDto);
@@ -198,7 +201,7 @@ describe('UsersController', () => {
 
       jest.spyOn(usersService, 'remove').mockResolvedValue(user);
 
-      const result = await usersController.remove(1); // Alterado de string para número
+      const result = await usersController.remove('1');
       expect(result).toEqual(user);
       expect(usersService.remove).toHaveBeenCalledWith(1);
     });
@@ -208,7 +211,7 @@ describe('UsersController', () => {
         .spyOn(usersService, 'remove')
         .mockRejectedValue(new NotFoundException('Usuário não encontrado.'));
 
-      await expect(usersController.remove(1)).rejects.toThrow(
+      await expect(usersController.remove('1')).rejects.toThrow(
         NotFoundException,
       );
       expect(usersService.remove).toHaveBeenCalledWith(1);

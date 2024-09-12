@@ -4,7 +4,7 @@ import {
   IsNotEmpty,
   IsString,
   IsDate,
-  IsOptional
+  IsOptional,
 } from 'class-validator';
 
 export class TrackingEntity implements Rastreamento {

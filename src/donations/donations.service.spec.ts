@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DonationsService } from './donations.service';
-import { DonationEntity } from './entities/donation.entity';
+// import { DonationEntity } from './entities/donation.entity';
 import { NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -54,6 +54,7 @@ describe('DonationsService', () => {
         usuarioID: 1,
         destinatarioID: 2,
         descricao: 'Descrição da doação',
+        QRCode: 'QRCodeString',
         qtdItens: 10,
         codigoRastreamento: '12345',
         entregue: false,
